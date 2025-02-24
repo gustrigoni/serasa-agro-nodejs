@@ -6,12 +6,12 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { producerDocumentValidation } from './../../../utils/producerDocumentValidation';
+import { producerDocumentIsValid } from '../../../utils/producerDocumentIsValid';
 
 @ValidatorConstraint()
 export class IsValidDocumentConstraint implements ValidatorConstraintInterface {
   validate(value: string): boolean {
-    return producerDocumentValidation(value);
+    return producerDocumentIsValid(value);
   }
 
   defaultMessage() {
@@ -19,7 +19,7 @@ export class IsValidDocumentConstraint implements ValidatorConstraintInterface {
   }
 }
 
-export class CreateProducerDto {
+export class SaveProducerDto {
   @ApiProperty({
     example: 'Gustavo Egidio Rigoni',
   })
@@ -29,11 +29,11 @@ export class CreateProducerDto {
   @Matches(/^[A-Za-z\s]+$/, {
     message: 'Nome completo do produtor deve conter apenas letras e espaços.',
   })
-  fullName: string;
+  readonly fullName: string;
 
   @ApiProperty({
     example: '93419415044',
   })
   @Validate(IsValidDocumentConstraint)
-  document: string;
+  readonly document: string;
 }

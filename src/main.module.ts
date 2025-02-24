@@ -5,6 +5,6 @@ import { FarmsModule } from './modules/farms/farms.module';
 import { ProducersModule } from './modules/producers/producers.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), FarmsModule, ProducersModule],
+  imports: [ConfigModule.forRoot(), ProducersModule, FarmsModule],
 })
 export class MainModule {}
