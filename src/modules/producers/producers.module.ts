@@ -3,7 +3,6 @@ import { ProducersController } from './producers.controller';
 import { ProducersService } from './producers.service';
 
 @Module({
-  imports: [],
   controllers: [ProducersController],
   providers: [ProducersService],
   exports: [ProducersService],
