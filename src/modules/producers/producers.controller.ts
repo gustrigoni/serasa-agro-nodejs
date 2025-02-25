@@ -14,7 +14,7 @@ import { ProducersService } from './producers.service';
 import { SaveProducerDto } from './dto/saveProducer.dto';
 import { Producer } from '@prisma/client';
 import { ApiParam } from '@nestjs/swagger';
-import { ProducerIdParam } from './dto/producerIdParam.dto';
+import { ProducerIdParamDto } from './dto/producerIdParam.dto';
 
 @Controller('producers')
 export class ProducersController {
@@ -23,9 +23,9 @@ export class ProducersController {
   @Post()
   @Version('1')
   @HttpCode(HttpStatus.CREATED)
-  createProducer(
+  async createProducer(
     @Body() saveCreateProducerDto: SaveProducerDto,
-  ): Promise<Producer> {
+  ): Promise<Producer | string> {
     return this.producersService.createProducer(saveCreateProducerDto);
   }
 
@@ -39,7 +39,7 @@ export class ProducersController {
   @HttpCode(HttpStatus.OK)
   updateProducer(
     @Body() saveUpdateProducerDto: SaveProducerDto,
-    @Param(ValidationPipe) { producerId }: ProducerIdParam,
+    @Param(ValidationPipe) { producerId }: ProducerIdParamDto,
   ): Promise<Producer> {
     return this.producersService.updateProducer(
       Number(producerId),
@@ -56,7 +56,7 @@ export class ProducersController {
   @Version('1')
   @HttpCode(HttpStatus.OK)
   removeProducer(
-    @Param(ValidationPipe) { producerId }: ProducerIdParam,
+    @Param(ValidationPipe) { producerId }: ProducerIdParamDto,
   ): Promise<Producer> {
     return this.producersService.removeProducer(Number(producerId));
   }

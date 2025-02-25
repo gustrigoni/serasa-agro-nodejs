@@ -26,14 +26,14 @@ export class SaveProducerDto {
   @IsNotEmpty({
     message: 'Nome completo do produtor precisa ser informado.',
   })
-  @Matches(/^[A-Za-z\s]+$/, {
+  @Matches(/^(?=.*\s)[A-Za-z\s]+$/, {
     message: 'Nome completo do produtor deve conter apenas letras e espaços.',
   })
-  readonly fullName: string;
+  fullName: string;
 
   @ApiProperty({
     example: '93419415044',
   })
   @Validate(IsValidDocumentConstraint)
-  readonly document: string;
+  document: string;
 }

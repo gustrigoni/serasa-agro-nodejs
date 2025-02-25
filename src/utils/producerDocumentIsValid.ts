@@ -68,8 +68,6 @@ export function producerDocumentIsValid(producerDocument: string) {
       documentNumbersList[10] ===
       calcCpfValidationDigits(PositionNumber.SECOND);
 
-    console.log(calcCpfValidationDigits(PositionNumber.FIRST));
-
     return isFirstValidationDigitValid && isSecondValidationDigitsValid;
   }
 

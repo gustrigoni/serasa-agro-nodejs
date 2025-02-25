@@ -1,8 +1,8 @@
 import { Matches } from 'class-validator';
 
-export class ProducerIdParam {
+export class ProducerIdParamDto {
   @Matches(/^[0-9]+$/, {
     message: 'O identificador único do produtor não é de um tipo válido.',
   })
-  readonly producerId: string;
+  producerId: string;
 }

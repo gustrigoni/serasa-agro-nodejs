@@ -1,10 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Producer, PrismaClient } from '@prisma/client';
+import { Producer } from '@prisma/client';
 import { SaveProducerDto } from './dto/saveProducer.dto';
+import { PrismaService } from './../../prisma.service';
 
 @Injectable()
 export class ProducersService {
-  private prisma = new PrismaClient();
+  constructor(private prisma: PrismaService) {}
 
   async createProducer({
     fullName,
@@ -12,12 +13,19 @@ export class ProducersService {
   }: SaveProducerDto): Promise<Producer> {
     await this.throwExceptionIfUserAlreadyExistsByDocument(document);
 
-    const producerData = await this.prisma.producer.create({
-      data: {
-        fullName,
-        document,
-      },
-    });
+    const producerData = await this.prisma.producer
+      .create({
+        data: {
+          fullName,
+          document,
+        },
+      })
+      .catch((error) => {
+        throw new BadRequestException(
+          'Não foi possível criar este produtor, tente novamente.',
+          { cause: error },
+        );
+      });
 
     return producerData;
   }
@@ -28,7 +36,7 @@ export class ProducersService {
   ): Promise<Producer> {
     await Promise.all([
       this.throwExceptionIfUserNotExistsByProducerId(producerId),
-      this.throwExceptionIfUserAlreadyExistsByDocument(document),
+      this.throwExceptionIfUserAlreadyExistsByDocument(document, producerId),
     ]);
 
     const newProducerData = await this.prisma.producer
@@ -70,11 +78,20 @@ export class ProducersService {
 
   private async throwExceptionIfUserAlreadyExistsByDocument(
     producerDocument: string,
+    producerId: number | undefined = undefined,
   ): Promise<void> {
-    const producerAlreadyExists = await this.prisma.producer.findUnique({
-      where: {
-        document: producerDocument,
-      },
+    const findProducerParameters = {
+      document: producerDocument,
+    };
+
+    if (producerId) {
+      findProducerParameters['NOT'] = {
+        id: producerId,
+      };
+    }
+
+    const producerAlreadyExists = await this.prisma.producer.findFirst({
+      where: findProducerParameters,
     });
 
     if (producerAlreadyExists) {
