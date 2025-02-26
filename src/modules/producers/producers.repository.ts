@@ -72,7 +72,7 @@ export class ProducersRepository {
       };
     }
 
-    const producerData = await this.prisma.producer.findFirst({
+    const producerData = await this.prisma.producer.findUnique({
       where: findProducerParameters,
     });
 
