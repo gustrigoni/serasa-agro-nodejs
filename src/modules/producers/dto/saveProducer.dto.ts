@@ -23,6 +23,7 @@ export class IsValidDocumentConstraint implements ValidatorConstraintInterface {
 export class SaveProducerDto {
   @ApiProperty({
     example: 'Gustavo Egidio Rigoni',
+    description: 'Producer full name',
   })
   @IsNotEmpty({
     message: 'Nome completo do produtor precisa ser informado.',
@@ -37,6 +38,7 @@ export class SaveProducerDto {
 
   @ApiProperty({
     example: '93419415044',
+    description: 'Producer document (CPF/CNPJ)',
   })
   @Validate(IsValidDocumentConstraint)
   document: string;
