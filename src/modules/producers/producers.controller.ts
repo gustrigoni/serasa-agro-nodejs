@@ -4,6 +4,7 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  Logger,
   Param,
   Patch,
   Post,
@@ -18,15 +19,23 @@ import { ProducerIdParamDto } from './dto/producerIdParam.dto';
 
 @Controller('producers')
 export class ProducersController {
+  private readonly logger = new Logger(ProducersService.name);
+
   constructor(private readonly producersService: ProducersService) {}
 
   @Post()
   @Version('1')
   @HttpCode(HttpStatus.CREATED)
-  async createProducer(
+  createProducer(
     @Body() saveCreateProducerDto: SaveProducerDto,
-  ): Promise<Producer | string> {
-    return this.producersService.createProducer(saveCreateProducerDto);
+  ): Promise<Producer> {
+    return this.producersService
+      .createProducer(saveCreateProducerDto)
+      .catch((error) => {
+        this.logger.warn('It was not possible to create a producer!', error);
+
+        throw error;
+      });
   }
 
   @ApiParam({
@@ -41,10 +50,13 @@ export class ProducersController {
     @Body() saveUpdateProducerDto: SaveProducerDto,
     @Param(ValidationPipe) { producerId }: ProducerIdParamDto,
   ): Promise<Producer> {
-    return this.producersService.updateProducer(
-      Number(producerId),
-      saveUpdateProducerDto,
-    );
+    return this.producersService
+      .updateProducer(Number(producerId), saveUpdateProducerDto)
+      .catch((error) => {
+        this.logger.warn('It was not possible to update a producer!');
+
+        throw error;
+      });
   }
 
   @ApiParam({
@@ -58,6 +70,12 @@ export class ProducersController {
   removeProducer(
     @Param(ValidationPipe) { producerId }: ProducerIdParamDto,
   ): Promise<Producer> {
-    return this.producersService.removeProducer(Number(producerId));
+    return this.producersService
+      .removeProducer(Number(producerId))
+      .catch((error) => {
+        this.logger.warn('It was not possible to remove a producer!');
+
+        throw error;
+      });
   }
 }

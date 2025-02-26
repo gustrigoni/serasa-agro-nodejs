@@ -1,10 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { Producer } from '@prisma/client';
 import { SaveProducerDto } from './dto/saveProducer.dto';
 import { ProducersRepository } from './producers.repository';
 
 @Injectable()
 export class ProducersService {
+  private readonly logger = new Logger(ProducersService.name);
+
   constructor(private producersRepository: ProducersRepository) {}
 
   async createProducer({
@@ -16,6 +18,8 @@ export class ProducersService {
     const producerData = await this.producersRepository
       .createProducer({ fullName, document })
       .catch((error) => {
+        this.logger.error('Ocorreu um erro ao tentar criar um produtor');
+
         throw new BadRequestException(
           'Não foi possível criar este produtor, tente novamente.',
           { cause: error },
@@ -37,6 +41,8 @@ export class ProducersService {
     const newProducerData = await this.producersRepository
       .updateProducer(producerId, { fullName, document })
       .catch((error) => {
+        this.logger.error('There was an error trying to update a producer');
+
         throw new BadRequestException(
           'Não foi possível atualizar este produtor, tente novamente.',
           { cause: error },
@@ -52,6 +58,8 @@ export class ProducersService {
     const removedProducerData = this.producersRepository
       .removeProducer(producerId)
       .catch((error) => {
+        this.logger.error('There was an error trying to remove a producer');
+
         throw new BadRequestException(
           'Não foi possível remover este produtor, tente novamente.',
           { cause: error },
@@ -65,11 +73,18 @@ export class ProducersService {
     producerDocument: string,
     producerId: number | undefined = undefined,
   ): Promise<void> {
-    const producerAlreadyExists =
-      await this.producersRepository.findProducerDocumetHasAlreadyUsed(
-        producerId,
-        producerDocument,
-      );
+    const producerAlreadyExists = await this.producersRepository
+      .findProducerDocumetHasAlreadyUsed(producerId, producerDocument)
+      .catch((error) => {
+        this.logger.error(
+          'There was an error trying to find a document by a producer',
+        );
+
+        throw new BadRequestException(
+          'Não foi possível verificar se o documento informado é válido.',
+          { cause: error },
+        );
+      });
 
     if (producerAlreadyExists) {
       throw new BadRequestException(
@@ -81,8 +96,16 @@ export class ProducersService {
   private async throwExceptionIfUserNotExistsByProducerId(
     producerId: number,
   ): Promise<void> {
-    const producerAlreadyExists =
-      await this.producersRepository.findProducerById(producerId);
+    const producerAlreadyExists = await this.producersRepository
+      .findProducerById(producerId)
+      .catch((error) => {
+        this.logger.error('There was an error trying to find a producer by id');
+
+        throw new BadRequestException(
+          'Não foi possível verificar se o produtor informado é válido.',
+          { cause: error },
+        );
+      });
 
     if (!producerAlreadyExists) {
       throw new BadRequestException('O produtor informado não existe.');
