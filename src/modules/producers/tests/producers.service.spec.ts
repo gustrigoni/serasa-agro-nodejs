@@ -2,17 +2,13 @@ import { Test } from '@nestjs/testing';
 import { ProducersService } from '../producers.service';
 import { BadRequestException } from '@nestjs/common';
 import { SaveProducerDto } from '../dto/saveProducer.dto';
-import { PrismaService } from './../../../prisma.service';
 import { Producer } from '@prisma/client';
-
-interface SpyProdutoServiceMethods {
-  throwExceptionIfUserAlreadyExistsByDocument(): Promise<jest.Mock>;
-  throwExceptionIfUserNotExistsByProducerId(): Promise<jest.Mock>;
-}
+import { ProducersRepository } from '../producers.repository';
+import { PrismaService } from './../../../prisma.service';
 
 describe('ProducersService', () => {
   let producersService: ProducersService;
-  let prismaService: PrismaService;
+  let producersRepository: ProducersRepository;
 
   const producersList = [
     {
@@ -21,7 +17,6 @@ describe('ProducersService', () => {
       document: '74311717000190',
       createdAt: new Date(),
       updatedAt: new Date(),
-      farms: null,
     },
     {
       id: 2,
@@ -29,43 +24,65 @@ describe('ProducersService', () => {
       document: '59035178033',
       createdAt: new Date(),
       updatedAt: new Date(),
-      farms: null,
     },
   ];
 
+  const mockProducersRepositoryFindProducerById = ({
+    producersRepository,
+    producerId,
+  }) => {
+    return jest
+      .spyOn(producersRepository, 'findProducerById')
+      .mockImplementation(() => {
+        const producer =
+          producersList.find((producer) => producer.id === producerId) || null;
+
+        return Promise.resolve(producer);
+      });
+  };
+
+  const mockProducersRepositoryFindProducerDocumetHasAlreadyUsed = (
+    { producersRepository, producerDocument },
+    producerId: number | undefined = undefined,
+  ) => {
+    return jest
+      .spyOn(producersRepository, 'findProducerDocumetHasAlreadyUsed')
+      .mockImplementation(() => {
+        const producer =
+          producersList.find((producer) => {
+            if (producerId) {
+              return (
+                producer.document === producerDocument &&
+                producer.id !== producerId
+              );
+            }
+            return producer.document === producerDocument;
+          }) || null;
+
+        return Promise.resolve(producer);
+      });
+  };
+
   beforeEach(async () => {
     const testingModule = await Test.createTestingModule({
-      providers: [
-        ProducersService,
-        {
-          provide: PrismaService,
-          useValue: {
-            producer: {
-              findUnique: jest.fn(),
-              findFirst: jest.fn(),
-              create: jest.fn(),
-              update: jest.fn(),
-              delete: jest.fn(),
-            },
-          },
-        },
-      ],
+      providers: [ProducersService, ProducersRepository, PrismaService],
     }).compile();
 
     producersService = testingModule.get<ProducersService>(ProducersService);
-    prismaService = testingModule.get<PrismaService>(PrismaService);
+    producersRepository =
+      testingModule.get<ProducersRepository>(ProducersRepository);
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('Producers service need to be defined', () => {
+  it('ProducersService need to be defined', () => {
     expect(producersService).toBeDefined();
   });
 
-  it('Prisma service need to be defined', () => {
-    expect(prismaService).toBeDefined();
+  it('ProducersRepository nned to be defined', () => {
+    expect(producersRepository).toBeDefined();
   });
 
   describe('Create Producer', () => {
@@ -75,16 +92,10 @@ describe('ProducersService', () => {
         document: '59035178033',
       };
 
-      jest
-        .spyOn(prismaService.producer as any, 'findFirst')
-        .mockImplementation(() => {
-          const producer =
-            producersList.find(
-              (producer) => producer.document === producerData.document,
-            ) || null;
-
-          return Promise.resolve(producer);
-        });
+      mockProducersRepositoryFindProducerDocumetHasAlreadyUsed({
+        producersRepository,
+        producerDocument: producerData.document,
+      });
 
       const createProducer = producersService.createProducer(producerData);
 
@@ -107,19 +118,13 @@ describe('ProducersService', () => {
         ...producerData,
       };
 
-      jest
-        .spyOn(prismaService.producer as any, 'findFirst')
-        .mockImplementation(() => {
-          const producer =
-            producersList.find(
-              (producer) => producer.document === producerData.document,
-            ) || null;
-
-          return Promise.resolve(producer);
-        });
+      mockProducersRepositoryFindProducerDocumetHasAlreadyUsed({
+        producersRepository,
+        producerDocument: producerData.document,
+      });
 
       jest
-        .spyOn(prismaService.producer as any, 'create')
+        .spyOn(producersRepository, 'createProducer')
         .mockImplementation(() => {
           return Promise.resolve(resultProducerData);
         });
@@ -138,22 +143,13 @@ describe('ProducersService', () => {
         document: '20718888000100',
       };
 
-      jest
-        .spyOn(
-          producersService as unknown as SpyProdutoServiceMethods,
-          'throwExceptionIfUserAlreadyExistsByDocument',
-        )
-        .mockImplementation();
+      mockProducersRepositoryFindProducerDocumetHasAlreadyUsed({
+        producersRepository,
+        producerDocument: producerData.document,
+      });
 
       jest
-        .spyOn(
-          producersService as unknown as SpyProdutoServiceMethods,
-          'throwExceptionIfUserAlreadyExistsByDocument',
-        )
-        .mockImplementation();
-
-      jest
-        .spyOn(prismaService.producer as any, 'create')
+        .spyOn(producersRepository, 'createProducer')
         .mockImplementation(() => {
           return Promise.reject(new Error('Ops!'));
         });
@@ -176,22 +172,15 @@ describe('ProducersService', () => {
         document: '74311717000190',
       };
 
-      jest
-        .spyOn(
-          producersService as unknown as SpyProdutoServiceMethods,
-          'throwExceptionIfUserAlreadyExistsByDocument',
-        )
-        .mockImplementation();
+      mockProducersRepositoryFindProducerDocumetHasAlreadyUsed(
+        { producersRepository, producerDocument: producerData.document },
+        producerId,
+      );
 
-      jest
-        .spyOn(prismaService.producer as any, 'findUnique')
-        .mockImplementation(() => {
-          const producer =
-            producersList.find((producer) => producer.id === producerId) ||
-            null;
-
-          return Promise.resolve(producer);
-        });
+      mockProducersRepositoryFindProducerById({
+        producersRepository,
+        producerId,
+      });
 
       const updateProducer = producersService.updateProducer(
         producerId,
@@ -212,25 +201,15 @@ describe('ProducersService', () => {
         document: '59035178033',
       };
 
-      jest
-        .spyOn(
-          producersService as unknown as SpyProdutoServiceMethods,
-          'throwExceptionIfUserNotExistsByProducerId',
-        )
-        .mockImplementation();
+      mockProducersRepositoryFindProducerById({
+        producersRepository,
+        producerId,
+      });
 
-      jest
-        .spyOn(prismaService.producer as any, 'findFirst')
-        .mockImplementation(() => {
-          const producer =
-            producersList.find(
-              (producer) =>
-                producer.document === producerData.document &&
-                producer.id !== producerId,
-            ) || null;
-
-          return Promise.resolve(producer);
-        });
+      mockProducersRepositoryFindProducerDocumetHasAlreadyUsed(
+        { producersRepository, producerDocument: producerData.document },
+        producerId,
+      );
 
       const updateProducer = producersService.updateProducer(
         producerId,
@@ -248,22 +227,18 @@ describe('ProducersService', () => {
 
       const producerData: SaveProducerDto = {
         fullName: 'Gustavo Egidio Rigoni',
-        document: '21823562563',
+        document: '74311717000190',
       };
 
-      jest
-        .spyOn(
-          producersService as unknown as SpyProdutoServiceMethods,
-          'throwExceptionIfUserNotExistsByProducerId',
-        )
-        .mockImplementation();
+      mockProducersRepositoryFindProducerById({
+        producersRepository,
+        producerId,
+      });
 
-      jest
-        .spyOn(
-          producersService as unknown as SpyProdutoServiceMethods,
-          'throwExceptionIfUserAlreadyExistsByDocument',
-        )
-        .mockImplementation();
+      mockProducersRepositoryFindProducerDocumetHasAlreadyUsed(
+        { producersRepository, producerDocument: producerData.document },
+        producerId,
+      );
 
       const resultProducerData: Producer = {
         id: producerId,
@@ -273,7 +248,7 @@ describe('ProducersService', () => {
       };
 
       jest
-        .spyOn(prismaService.producer as any, 'update')
+        .spyOn(producersRepository, 'updateProducer')
         .mockImplementation(() => {
           return Promise.resolve(resultProducerData);
         });
@@ -294,25 +269,21 @@ describe('ProducersService', () => {
 
       const producerData: SaveProducerDto = {
         fullName: 'Gustavo Egidio Rigoni',
-        document: '21823562563',
+        document: '74311717000190',
       };
 
-      jest
-        .spyOn(
-          producersService as unknown as SpyProdutoServiceMethods,
-          'throwExceptionIfUserNotExistsByProducerId',
-        )
-        .mockImplementation();
+      mockProducersRepositoryFindProducerById({
+        producersRepository,
+        producerId,
+      });
+
+      mockProducersRepositoryFindProducerDocumetHasAlreadyUsed(
+        { producersRepository, producerDocument: producerData.document },
+        producerId,
+      );
 
       jest
-        .spyOn(
-          producersService as unknown as SpyProdutoServiceMethods,
-          'throwExceptionIfUserAlreadyExistsByDocument',
-        )
-        .mockImplementation();
-
-      jest
-        .spyOn(prismaService.producer as any, 'update')
+        .spyOn(producersRepository, 'updateProducer')
         .mockImplementation(() => {
           return Promise.reject(new Error('Ops!'));
         });
@@ -338,15 +309,10 @@ describe('ProducersService', () => {
         document: '21823562563',
       };
 
-      jest
-        .spyOn(prismaService.producer as any, 'findUnique')
-        .mockImplementation(() => {
-          const producer =
-            producersList.find((producer) => producer.id === producerId) ||
-            null;
-
-          return Promise.resolve(producer);
-        });
+      mockProducersRepositoryFindProducerById({
+        producersRepository,
+        producerId,
+      });
 
       const updateProducer = producersService.updateProducer(
         producerId,
@@ -367,28 +333,26 @@ describe('ProducersService', () => {
         document: '21823562563',
       };
 
-      jest
-        .spyOn(
-          producersService as unknown as SpyProdutoServiceMethods,
-          'throwExceptionIfUserNotExistsByProducerId',
-        )
-        .mockImplementation();
-
-      jest
-        .spyOn(prismaService.producer as any, 'delete')
-        .mockImplementation(() => {
-          return Promise.resolve(resultProducerData);
-        });
-
-      const removeProducerProducer =
-        producersService.removeProducer(producerId);
-
       const resultProducerData: Producer = {
         id: producerId,
         createdAt: new Date(),
         updatedAt: new Date(),
         ...producerData,
       };
+
+      mockProducersRepositoryFindProducerById({
+        producersRepository,
+        producerId,
+      });
+
+      jest
+        .spyOn(producersRepository, 'removeProducer')
+        .mockImplementation(() => {
+          return Promise.resolve(resultProducerData);
+        });
+
+      const removeProducerProducer =
+        producersService.removeProducer(producerId);
 
       await expect(removeProducerProducer).resolves.toBe(resultProducerData);
       await expect(removeProducerProducer).resolves.not.toBeInstanceOf(
@@ -399,15 +363,13 @@ describe('ProducersService', () => {
     it(`The method removeProducer need to throw an error when prisma can't remove the data`, async () => {
       const producerId: number = 1;
 
-      jest
-        .spyOn(
-          producersService as unknown as SpyProdutoServiceMethods,
-          'throwExceptionIfUserNotExistsByProducerId',
-        )
-        .mockImplementation();
+      mockProducersRepositoryFindProducerById({
+        producersRepository,
+        producerId,
+      });
 
       jest
-        .spyOn(prismaService.producer as any, 'delete')
+        .spyOn(producersRepository, 'removeProducer')
         .mockImplementation(() => {
           return Promise.reject(new Error('Ops!'));
         });
