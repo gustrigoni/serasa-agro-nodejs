@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   Matches,
+  MaxLength,
   Validate,
   ValidatorConstraint,
   ValidatorConstraintInterface,
@@ -28,6 +29,9 @@ export class SaveProducerDto {
   })
   @Matches(/^(?=.*\s)[A-Za-z\s]+$/, {
     message: 'Nome completo do produtor deve conter apenas letras e espaços.',
+  })
+  @MaxLength(75, {
+    message: 'Nome completo do produtor deve conter no máximo 75 caracteres.',
   })
   fullName: string;
 
