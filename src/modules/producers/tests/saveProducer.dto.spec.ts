@@ -49,7 +49,7 @@ describe('SaveProducerDto', () => {
     expect(dtoError.constraints).toBeDefined();
     expect(dtoError.constraints?.matches).toBeDefined();
     expect(dtoError.constraints?.matches).toBe(
-      'Nome completo do produtor deve conter apenas letras e espaços.',
+      'Nome completo do produtor deve conter apenas letras e deve ser informado o sobrenome.',
     );
   });
 
