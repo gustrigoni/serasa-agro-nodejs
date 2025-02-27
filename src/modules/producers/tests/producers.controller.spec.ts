@@ -53,8 +53,10 @@ describe('ProducersController', () => {
       };
 
       jest.spyOn(producersService, 'createProducer').mockImplementation(() => {
-        throw new BadRequestException(
-          'Já existe um produtor cadastrado com este CPF/CNPJ.',
+        return Promise.reject(
+          new BadRequestException(
+            'Já existe um produtor cadastrado com este CPF/CNPJ.',
+          ),
         );
       });
 
@@ -74,8 +76,10 @@ describe('ProducersController', () => {
       };
 
       jest.spyOn(producersService, 'createProducer').mockImplementation(() => {
-        throw new BadRequestException(
-          'Não foi possível criar este produtor, tente novamente.',
+        return Promise.reject(
+          new BadRequestException(
+            'Não foi possível criar este produtor, tente novamente.',
+          ),
         );
       });
 

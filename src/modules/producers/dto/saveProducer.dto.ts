@@ -28,8 +28,9 @@ export class SaveProducerDto {
   @IsNotEmpty({
     message: 'Nome completo do produtor precisa ser informado.',
   })
-  @Matches(/^(?=.*\s)[A-Za-z\s]+$/, {
-    message: 'Nome completo do produtor deve conter apenas letras e espaços.',
+  @Matches(/^(?=.*\s)[A-Za-zÀ-ÿ\s]+$/, {
+    message:
+      'Nome completo do produtor deve conter apenas letras e deve ser informado o sobrenome.',
   })
   @MaxLength(75, {
     message: 'Nome completo do produtor deve conter no máximo 75 caracteres.',
