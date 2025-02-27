@@ -26,9 +26,9 @@ model Farm {
   producerId     Int
   city           String  @db.VarChar(25)
   state          String  @db.VarChar(2)
-  totalArea      Decimal @map("total_area")
-  cultivableArea Decimal @map("cultivable_area")
-  preservedArea  Decimal @map("preserved_area")
+  totalArea      Decimal @map("total_area") @db.Decimal(30, 2)
+  cultivableArea Decimal @map("cultivable_area") @db.Decimal(10, 2)
+  preservedArea  Decimal @map("preserved_area") @db.Decimal(10, 2)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -42,9 +42,9 @@ model Farm {
 
 model FarmCultivation {
   id              Int     @id @default(autoincrement())
-  cultivationName String  @map("cultivation_name")
+  cultivationName String  @map("cultivation_name") @db.VarChar(50)
   farmId          Int     @map("farm_id")
-  cultivatedArea  Decimal @map("cultivated_area")
+  cultivatedArea  Decimal @map("cultivated_area") @db.Decimal(10, 2)
   harverst        String  @map("harverst") @db.VarChar(4)
 
   createdAt DateTime @default(now()) @map("created_at")
