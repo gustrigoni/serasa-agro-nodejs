@@ -11,10 +11,9 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator';
 import { ValidStatesEnum } from '../enums/validStates.enum';
-import { Prisma } from '@prisma/client';
 
 @ValidatorConstraint()
-export class IsValidStateConstraint implements ValidatorConstraintInterface {
+class IsValidStateConstraint implements ValidatorConstraintInterface {
   validate(value: ValidStatesEnum): boolean {
     return Object.values(ValidStatesEnum).includes(value);
   }
@@ -81,7 +80,7 @@ export class SaveFarmDto {
   state: string;
 
   @ApiProperty({
-    example: 3000,
+    example: 30000,
     description: `Property total area (in hectares)`,
   })
   @IsNumber(
@@ -95,10 +94,10 @@ export class SaveFarmDto {
   @Min(0, {
     message: 'A área total informada não pode conter valor negativo',
   })
-  totalArea: Prisma.Decimal;
+  totalArea: number;
 
   @ApiProperty({
-    example: 1000,
+    example: 2850.96,
     description: `Property cultivable area (in hectares)`,
   })
   @IsNumber(
@@ -112,10 +111,10 @@ export class SaveFarmDto {
   @Min(0, {
     message: 'A área cultivável informada não pode conter valor negativo.',
   })
-  cultivableArea: Prisma.Decimal;
+  cultivableArea: number;
 
   @ApiProperty({
-    example: 2000,
+    example: 27000,
     description: `Property preserved area (in hectares)`,
   })
   @IsNumber(
@@ -129,5 +128,5 @@ export class SaveFarmDto {
   @Min(0, {
     message: 'A área preservada informada não pode conter valor negativo.',
   })
-  preservedArea: Prisma.Decimal;
+  preservedArea: number;
 }

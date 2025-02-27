@@ -1,10 +1,14 @@
 import { Test } from '@nestjs/testing';
 import { ProducersService } from '../producers.service';
-import { BadRequestException, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { SaveProducerDto } from '../dto/saveProducer.dto';
 import { Producer } from '@prisma/client';
 import { ProducersRepository } from '../producers.repository';
-import { PrismaService } from './../../../prisma.service';
+import { PrismaService } from './../../../modules/prisma/prisma.service';
 
 describe('ProducersService', () => {
   let producersService: ProducersService;
@@ -66,9 +70,6 @@ describe('ProducersService', () => {
   beforeEach(async () => {
     const testingModule = await Test.createTestingModule({
       providers: [
-        ProducersService,
-        ProducersRepository,
-        PrismaService,
         {
           provide: Logger,
           useValue: {
@@ -79,6 +80,9 @@ describe('ProducersService', () => {
             verbose: jest.fn(),
           },
         },
+        ProducersService,
+        ProducersRepository,
+        PrismaService,
       ],
     }).compile();
 
@@ -95,12 +99,12 @@ describe('ProducersService', () => {
     expect(producersService).toBeDefined();
   });
 
-  it('ProducersRepository nned to be defined', () => {
+  it('ProducersRepository need to be defined', () => {
     expect(producersRepository).toBeDefined();
   });
 
   describe('Create Producer', () => {
-    it(`The method createProducer need to throw an error when producer's document already exists`, async () => {
+    it(`The method createProducer need to throw a BadRequestException when producer's document already exists`, async () => {
       const producerData: SaveProducerDto = {
         fullName: 'Gustavo Egidio Rigoni',
         document: '59035178033',
@@ -151,7 +155,7 @@ describe('ProducersService', () => {
       );
     });
 
-    it(`The method createProducer need to throw an error when prisma can't remove the data`, async () => {
+    it(`The method createProducer need to throw an InternalServerErrorException when prisma can't remove the data`, async () => {
       const producerData: SaveProducerDto = {
         fullName: 'Gustavo Egidio Rigoni',
         document: '20718888000100',
@@ -170,7 +174,9 @@ describe('ProducersService', () => {
 
       const createProducer = producersService.createProducer(producerData);
 
-      await expect(createProducer).rejects.toBeInstanceOf(BadRequestException);
+      await expect(createProducer).rejects.toBeInstanceOf(
+        InternalServerErrorException,
+      );
       await expect(createProducer).rejects.toThrow(
         'Não foi possível criar este produtor, tente novamente.',
       );
@@ -178,7 +184,7 @@ describe('ProducersService', () => {
   });
 
   describe('Update Producer', () => {
-    it(`The method updateProducer need to throw an error when producer's id not exists`, async () => {
+    it(`The method updateProducer need to throw a BadRequestException when producer's id not exists`, async () => {
       const producerId: number = -1;
 
       const producerData: SaveProducerDto = {
@@ -207,7 +213,7 @@ describe('ProducersService', () => {
       );
     });
 
-    it(`The method updateProducer need to throw an error when producer's id exists but document already used`, async () => {
+    it(`The method updateProducer need to throw a BadRequestException when producer's id exists but document is already used`, async () => {
       const producerId: number = 1;
 
       const producerData: SaveProducerDto = {
@@ -278,7 +284,7 @@ describe('ProducersService', () => {
       );
     });
 
-    it(`The method updateProducer need to throw an error when prisma can't remove the data`, async () => {
+    it(`The method updateProducer need to throw a InternalServerErrorException when prisma can't remove the data`, async () => {
       const producerId: number = 1;
 
       const producerData: SaveProducerDto = {
@@ -307,7 +313,9 @@ describe('ProducersService', () => {
         producerData,
       );
 
-      await expect(updateProducer).rejects.toBeInstanceOf(BadRequestException);
+      await expect(updateProducer).rejects.toBeInstanceOf(
+        InternalServerErrorException,
+      );
       await expect(updateProducer).rejects.toThrow(
         'Não foi possível atualizar este produtor, tente novamente.',
       );
@@ -315,7 +323,7 @@ describe('ProducersService', () => {
   });
 
   describe('Remove Producer', () => {
-    it(`The method removeProducer need to throw an error when producer's id not exists`, async () => {
+    it(`The method removeProducer need to throw a BadRequestException when producer's id not exists`, async () => {
       const producerId: number = -1;
 
       const producerData = {
@@ -374,7 +382,7 @@ describe('ProducersService', () => {
       );
     });
 
-    it(`The method removeProducer need to throw an error when prisma can't remove the data`, async () => {
+    it(`The method removeProducer need to throw a InternalServerErrorException when prisma can't remove the data`, async () => {
       const producerId: number = 1;
 
       mockProducersRepositoryFindProducerById({
@@ -392,7 +400,7 @@ describe('ProducersService', () => {
         producersService.removeProducer(producerId);
 
       await expect(removeProducerProducer).rejects.toBeInstanceOf(
-        BadRequestException,
+        InternalServerErrorException,
       );
       await expect(removeProducerProducer).rejects.toThrow(
         'Não foi possível remover este produtor, tente novamente.',

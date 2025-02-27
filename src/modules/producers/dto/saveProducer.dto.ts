@@ -10,7 +10,7 @@ import {
 import { producerDocumentIsValid } from '../../../utils/producerDocumentIsValid';
 
 @ValidatorConstraint()
-export class IsValidDocumentConstraint implements ValidatorConstraintInterface {
+class IsValidDocumentConstraint implements ValidatorConstraintInterface {
   validate(value: string): boolean {
     return producerDocumentIsValid(value);
   }

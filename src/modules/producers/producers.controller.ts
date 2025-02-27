@@ -13,25 +13,39 @@ import {
 } from '@nestjs/common';
 import { ProducersService } from './producers.service';
 import { SaveProducerDto } from './dto/saveProducer.dto';
-import { Producer } from '@prisma/client';
-import { ApiCreatedResponse, ApiOkResponse, ApiParam } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiOkResponse,
+  ApiParam,
+} from '@nestjs/swagger';
 import { ProducerIdParamDto } from './dto/producerIdParam.dto';
+import { ProducerEntityDto } from '../prisma/dto/producer.entity.dto';
 
 @Controller('producers')
 export class ProducersController {
-  private readonly logger = new Logger(ProducersController.name);
-
-  constructor(private readonly producersService: ProducersService) {}
+  constructor(
+    private readonly producersService: ProducersService,
+    private readonly logger: Logger = new Logger(ProducersController.name),
+  ) {}
 
   @Post()
   @Version('1')
   @HttpCode(HttpStatus.CREATED)
   @ApiCreatedResponse({
-    description: 'Produtor has been created successfully',
+    description: 'Producer has been created successfully',
+    type: ProducerEntityDto,
+  })
+  @ApiBadRequestResponse({
+    description: "Was not possible validate the producer's data informed",
+  })
+  @ApiInternalServerErrorResponse({
+    description: `Was not possible to create a producer due to an internal error`,
   })
   createProducer(
     @Body() saveCreateProducerDto: SaveProducerDto,
-  ): Promise<Producer> {
+  ): Promise<ProducerEntityDto> {
     return this.producersService
       .createProducer(saveCreateProducerDto)
       .catch((error) => {
@@ -44,18 +58,25 @@ export class ProducersController {
   @ApiParam({
     name: 'producerId',
     example: 291,
-    description: 'Identificador único do produtor',
+    description: 'Unique producer identification number',
   })
   @Patch('/:producerId')
   @Version('1')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
-    description: 'Produtor has been updated successfully',
+    description: 'Producer has been updated successfully',
+    type: ProducerEntityDto,
+  })
+  @ApiBadRequestResponse({
+    description: "Was not possible validate the producer's data informed",
+  })
+  @ApiInternalServerErrorResponse({
+    description: `Was not possible to update the producer due to an internal error`,
   })
   updateProducer(
     @Body() saveUpdateProducerDto: SaveProducerDto,
     @Param(ValidationPipe) { producerId }: ProducerIdParamDto,
-  ): Promise<Producer> {
+  ): Promise<ProducerEntityDto> {
     return this.producersService
       .updateProducer(Number(producerId), saveUpdateProducerDto)
       .catch((error) => {
@@ -68,17 +89,24 @@ export class ProducersController {
   @ApiParam({
     name: 'producerId',
     example: 291,
-    description: 'Identificador único do produtor',
+    description: 'Unique producer identification number',
   })
   @Delete('/:producerId')
   @Version('1')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
-    description: 'Produtor has been removed successfully',
+    description: 'Producer has been removed successfully',
+    type: ProducerEntityDto,
+  })
+  @ApiBadRequestResponse({
+    description: "Was not possible validate the producer's data informed",
+  })
+  @ApiInternalServerErrorResponse({
+    description: `Was not possible to update the producer due to an internal error`,
   })
   removeProducer(
     @Param(ValidationPipe) { producerId }: ProducerIdParamDto,
-  ): Promise<Producer> {
+  ): Promise<ProducerEntityDto> {
     return this.producersService
       .removeProducer(Number(producerId))
       .catch((error) => {

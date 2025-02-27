@@ -1,25 +1,41 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma, Farm, FarmCultivation } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { SaveFarmDto } from './dto/saveFarm.dto';
 import { SaveFarmCultivationDto } from './dto/saveFarmCultivation.dto';
+import { FarmEntityDto } from '../prisma/dto/farm.entity.dto';
+import { FarmCultivationEntityDto } from '../prisma/dto/farmCultivation.entity.dto';
 
 @Injectable()
 export class FarmsRepository {
   constructor(private prisma: PrismaService) {}
 
-  async createFarm(saveFarmDto: SaveFarmDto): Promise<Farm> {
-    const farmData = this.prisma.farm.create({ data: saveFarmDto });
+  async createFarm(saveFarmDto: SaveFarmDto): Promise<FarmEntityDto> {
+    const farmData = await this.prisma.farm.create({ data: saveFarmDto });
 
-    return farmData;
+    return {
+      ...farmData,
+      totalArea: farmData.totalArea.toNumber(),
+      cultivableArea: farmData.cultivableArea.toNumber(),
+      preservedArea: farmData.preservedArea.toNumber(),
+    };
   }
 
-  async findFarmById(farmId: number): Promise<Farm | null> {
-    const farmData = this.prisma.farm.findUnique({
+  async findFarmById(farmId: number): Promise<FarmEntityDto | null> {
+    const farmData = await this.prisma.farm.findUnique({
       where: { id: farmId },
     });
 
-    return farmData;
+    if (!farmData) {
+      return null;
+    }
+
+    return {
+      ...farmData,
+      totalArea: farmData.totalArea.toNumber(),
+      cultivableArea: farmData.cultivableArea.toNumber(),
+      preservedArea: farmData.preservedArea.toNumber(),
+    };
   }
 
   async findCultivatedAreaByFarmId(farmId: number): Promise<Prisma.Decimal> {
@@ -42,12 +58,15 @@ export class FarmsRepository {
 
   async createFarmCultivation(
     saveFarmCultivationDto: SaveFarmCultivationDto,
-  ): Promise<FarmCultivation> {
-    const farmCultivationData = this.prisma.farmCultivation.create({
+  ): Promise<FarmCultivationEntityDto> {
+    const farmCultivationData = await this.prisma.farmCultivation.create({
       data: saveFarmCultivationDto,
     });
 
-    return farmCultivationData;
+    return {
+      ...farmCultivationData,
+      cultivatedArea: farmCultivationData.cultivatedArea.toNumber(),
+    };
   }
 
   async countFarms(): Promise<number> {

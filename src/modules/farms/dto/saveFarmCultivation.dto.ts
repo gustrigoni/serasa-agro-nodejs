@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Prisma } from '@prisma/client';
 import { IsNotEmpty, IsNumber, Matches, MaxLength, Min } from 'class-validator';
 
 export class SaveFarmCultivationDto {
@@ -51,7 +50,7 @@ export class SaveFarmCultivationDto {
   @Min(0, {
     message: 'A área cultivada informada não pode conter valor negativo.',
   })
-  cultivatedArea: Prisma.Decimal;
+  cultivatedArea: number;
 
   @ApiProperty({
     example: '2021',

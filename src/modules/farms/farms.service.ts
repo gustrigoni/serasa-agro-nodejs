@@ -1,10 +1,17 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { ProducersRepository } from '../producers/producers.repository';
 import { SaveFarmDto } from './dto/saveFarm.dto';
-import { Prisma, Farm, FarmCultivation } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { FarmsRepository } from './farms.repository';
 import { SaveFarmCultivationDto } from './dto/saveFarmCultivation.dto';
-import { ListFarmsCultivations } from './dto/listFarmsCultivations.dto';
+import { ListFarmsCultivationsDto } from './dto/listFarmsCultivations.dto';
+import { FarmEntityDto } from '../prisma/dto/farm.entity.dto';
+import { FarmCultivationEntityDto } from '../prisma/dto/farmCultivation.entity.dto';
 
 @Injectable()
 export class FarmsService {
@@ -22,7 +29,7 @@ export class FarmsService {
     totalArea,
     cultivableArea,
     preservedArea,
-  }: SaveFarmDto): Promise<Farm> {
+  }: SaveFarmDto): Promise<FarmEntityDto> {
     const producersExists =
       await this.producersRepository.findProducerById(producerId);
 
@@ -58,7 +65,7 @@ export class FarmsService {
       .catch((error) => {
         this.logger.error('There was an error trying to create a farm.');
 
-        throw new BadRequestException(
+        throw new InternalServerErrorException(
           'Não foi possível criar esta propriedade, tente novamente.',
           { cause: error },
         );
@@ -72,16 +79,16 @@ export class FarmsService {
     cultivationName,
     cultivatedArea,
     harvest,
-  }: SaveFarmCultivationDto): Promise<FarmCultivation> {
+  }: SaveFarmCultivationDto): Promise<FarmCultivationEntityDto> {
     const [farm, farmCultivation] = await Promise.all([
       this.farmsRepository.findFarmById(farmId).catch((error) => {
-        throw new BadRequestException(
+        throw new InternalServerErrorException(
           'Não foi possível verificar se a fazenda informada é válido.',
           { cause: error },
         );
       }),
       this.farmsRepository.findCultivatedAreaByFarmId(farmId).catch((error) => {
-        throw new BadRequestException(
+        throw new InternalServerErrorException(
           'Não foi possível verificar a área usada é válido.',
           { cause: error },
         );
@@ -119,8 +126,8 @@ export class FarmsService {
           'There was an error trying to create a farm cultivation.',
         );
 
-        throw new BadRequestException(
-          'Não foi possível criar esta cultivação, tente novamente.',
+        throw new InternalServerErrorException(
+          'Não foi possível criar este cultivo, tente novamente.',
           { cause: error },
         );
       });
@@ -128,7 +135,7 @@ export class FarmsService {
     return farmCultivationData;
   }
 
-  async listFarmsCultivations(): Promise<ListFarmsCultivations> {
+  async listFarmsCultivations(): Promise<ListFarmsCultivationsDto> {
     const promiseCountFarms = this.farmsRepository
       .countFarms()
       .catch((error) => {
@@ -136,7 +143,7 @@ export class FarmsService {
           'There was an error trying to count farms has been created.',
         );
 
-        throw new BadRequestException(
+        throw new InternalServerErrorException(
           'Ocorreu um erro ao tentar contabilizar as propriedades criadas.',
           { cause: error },
         );
@@ -149,7 +156,7 @@ export class FarmsService {
           'There was an error trying to count farms has been created by states.',
         );
 
-        throw new BadRequestException(
+        throw new InternalServerErrorException(
           'Ocorreu um erro ao tentar contabilizar as propriedades criadas por estados.',
           { cause: error },
         );
@@ -162,7 +169,7 @@ export class FarmsService {
           'There was an error trying to count farms cultivations.',
         );
 
-        throw new BadRequestException(
+        throw new InternalServerErrorException(
           'Ocorreu um erro ao tentar contabilizar as culturas de cultivo.',
           { cause: error },
         );
@@ -173,7 +180,7 @@ export class FarmsService {
       .catch((error) => {
         this.logger.error('There was an error trying to sum farms total area.');
 
-        throw new BadRequestException(
+        throw new InternalServerErrorException(
           'Ocorreu um erro ao tentar contabilizar área total das propriedades criadas.',
           { cause: error },
         );
@@ -186,7 +193,7 @@ export class FarmsService {
           'There was an error trying to sum farms cultivable and preservation areas.',
         );
 
-        throw new BadRequestException(
+        throw new InternalServerErrorException(
           'Ocorreu um erro ao tentar contabilizar as áreas de cultivo e preservação das propriedades.',
           { cause: error },
         );

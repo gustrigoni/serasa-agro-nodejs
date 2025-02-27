@@ -1,7 +1,12 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import { Producer } from '@prisma/client';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { SaveProducerDto } from './dto/saveProducer.dto';
 import { ProducersRepository } from './producers.repository';
+import { ProducerEntityDto } from '../prisma/dto/producer.entity.dto';
 
 @Injectable()
 export class ProducersService {
@@ -13,7 +18,7 @@ export class ProducersService {
   async createProducer({
     fullName,
     document,
-  }: SaveProducerDto): Promise<Producer> {
+  }: SaveProducerDto): Promise<ProducerEntityDto> {
     await this.throwExceptionIfUserAlreadyExistsByDocument(document);
 
     const producerData = await this.producersRepository
@@ -21,7 +26,7 @@ export class ProducersService {
       .catch((error) => {
         this.logger.error('There was an error trying to create a producer');
 
-        throw new BadRequestException(
+        throw new InternalServerErrorException(
           'Não foi possível criar este produtor, tente novamente.',
           { cause: error },
         );
@@ -33,7 +38,7 @@ export class ProducersService {
   async updateProducer(
     producerId: number,
     { fullName, document }: SaveProducerDto,
-  ): Promise<Producer> {
+  ): Promise<ProducerEntityDto> {
     await Promise.all([
       this.throwExceptionIfUserNotExistsByProducerId(producerId),
       this.throwExceptionIfUserAlreadyExistsByDocument(document, producerId),
@@ -44,7 +49,7 @@ export class ProducersService {
       .catch((error) => {
         this.logger.error('There was an error trying to update a producer');
 
-        throw new BadRequestException(
+        throw new InternalServerErrorException(
           'Não foi possível atualizar este produtor, tente novamente.',
           { cause: error },
         );
@@ -53,7 +58,7 @@ export class ProducersService {
     return newProducerData;
   }
 
-  async removeProducer(producerId: number): Promise<Producer> {
+  async removeProducer(producerId: number): Promise<ProducerEntityDto> {
     await this.throwExceptionIfUserNotExistsByProducerId(producerId);
 
     const removedProducerData = this.producersRepository
@@ -61,7 +66,7 @@ export class ProducersService {
       .catch((error) => {
         this.logger.error('There was an error trying to remove a producer');
 
-        throw new BadRequestException(
+        throw new InternalServerErrorException(
           'Não foi possível remover este produtor, tente novamente.',
           { cause: error },
         );
@@ -81,7 +86,7 @@ export class ProducersService {
           'There was an error trying to find a document by a producer',
         );
 
-        throw new BadRequestException(
+        throw new InternalServerErrorException(
           'Não foi possível verificar se o documento informado é válido.',
           { cause: error },
         );
@@ -102,7 +107,7 @@ export class ProducersService {
       .catch((error) => {
         this.logger.error('There was an error trying to find a producer by id');
 
-        throw new BadRequestException(
+        throw new InternalServerErrorException(
           'Não foi possível verificar se o produtor informado é válido.',
           { cause: error },
         );

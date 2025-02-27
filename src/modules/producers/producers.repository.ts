@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Producer } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { SaveProducerDto } from './dto/saveProducer.dto';
+import { ProducerEntityDto } from '../prisma/dto/producer.entity.dto';
 
 @Injectable()
 export class ProducersRepository {
@@ -10,7 +10,7 @@ export class ProducersRepository {
   async createProducer({
     fullName,
     document,
-  }: SaveProducerDto): Promise<Producer> {
+  }: SaveProducerDto): Promise<ProducerEntityDto> {
     const producerData = this.prisma.producer.create({
       data: {
         fullName: fullName,
@@ -24,7 +24,7 @@ export class ProducersRepository {
   async updateProducer(
     producerId: number,
     { fullName: producerFullName, document: producerDocument }: SaveProducerDto,
-  ): Promise<Producer> {
+  ): Promise<ProducerEntityDto> {
     const producerData = await this.prisma.producer.update({
       data: {
         fullName: producerFullName,
@@ -38,7 +38,7 @@ export class ProducersRepository {
     return producerData;
   }
 
-  async removeProducer(producerId: number): Promise<Producer> {
+  async removeProducer(producerId: number): Promise<ProducerEntityDto> {
     const producerData = this.prisma.producer.delete({
       where: {
         id: producerId,
@@ -48,7 +48,9 @@ export class ProducersRepository {
     return producerData;
   }
 
-  async findProducerById(producerId: number): Promise<Producer | null> {
+  async findProducerById(
+    producerId: number,
+  ): Promise<ProducerEntityDto | null> {
     const producerData = await this.prisma.producer.findUnique({
       where: {
         id: producerId,
@@ -61,7 +63,7 @@ export class ProducersRepository {
   async findProducerDocumetHasAlreadyUsed(
     producerId: number | undefined = undefined,
     producerDocument: string,
-  ): Promise<Producer | null> {
+  ): Promise<ProducerEntityDto | null> {
     const findProducerParameters = {
       document: producerDocument,
     };

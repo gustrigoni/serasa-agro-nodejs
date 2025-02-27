@@ -5,6 +5,7 @@ import { SaveProducerDto } from '../dto/saveProducer.dto';
 import {
   BadRequestException,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { Producer } from '@prisma/client';
 
@@ -23,6 +24,16 @@ describe('ProducersController', () => {
             updateProducer: jest.fn(),
             removeProducer: jest.fn(),
             delete: jest.fn(),
+          },
+        },
+        {
+          provide: Logger,
+          useValue: {
+            log: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+            verbose: jest.fn(),
           },
         },
       ],
@@ -46,7 +57,7 @@ describe('ProducersController', () => {
   });
 
   describe('Create Producer', () => {
-    it(`The method createProducer need to throw a bad request exception when producer's document already exists`, async () => {
+    it(`The method createProducer need to throw a BadRequestException when service's method return a BadRequestException`, async () => {
       const createProducerDto: SaveProducerDto = {
         fullName: 'Gustavo Egidio Rigoni',
         document: '00012398755',
@@ -69,7 +80,7 @@ describe('ProducersController', () => {
       );
     });
 
-    it(`The method createProducer need to throw a bad request exception when Prisma can't create the data`, async () => {
+    it(`The method createProducer need to throw a InternalServerErrorException when service's method return a InternalServerErrorException`, async () => {
       const createProducerDto: SaveProducerDto = {
         fullName: 'Gustavo Egidio Rigoni',
         document: '00012398755',
@@ -77,7 +88,7 @@ describe('ProducersController', () => {
 
       jest.spyOn(producersService, 'createProducer').mockImplementation(() => {
         return Promise.reject(
-          new BadRequestException(
+          new InternalServerErrorException(
             'Não foi possível criar este produtor, tente novamente.',
           ),
         );
@@ -86,7 +97,9 @@ describe('ProducersController', () => {
       const createProducer =
         producersController.createProducer(createProducerDto);
 
-      await expect(createProducer).rejects.toBeInstanceOf(BadRequestException);
+      await expect(createProducer).rejects.toBeInstanceOf(
+        InternalServerErrorException,
+      );
       await expect(createProducer).rejects.toThrow(
         'Não foi possível criar este produtor, tente novamente.',
       );
@@ -123,7 +136,7 @@ describe('ProducersController', () => {
   });
 
   describe('Update Producer', () => {
-    it(`The method updateProducer need to throw a bad request exception when producer's document already exists`, async () => {
+    it(`The method updateProducer need to throw a BadRequestException when service's method return a BadRequestException`, async () => {
       const producerId: string = '1';
 
       const updateProducerDto: SaveProducerDto = {
@@ -150,7 +163,7 @@ describe('ProducersController', () => {
       );
     });
 
-    it(`The method updateProducer need to throw a bad request exception when producer's id not exists`, async () => {
+    it(`The method updateProducer need to throw a InternalServerErrorException when service's method return a InternalServerErrorException`, async () => {
       const producerId: string = '1';
 
       const updateProducerDto: SaveProducerDto = {
@@ -160,7 +173,7 @@ describe('ProducersController', () => {
 
       jest.spyOn(producersService, 'updateProducer').mockImplementation(() => {
         return Promise.reject(
-          new BadRequestException('O produtor informado não existe.'),
+          new InternalServerErrorException('O produtor informado não existe.'),
         );
       });
 
@@ -169,7 +182,9 @@ describe('ProducersController', () => {
         { producerId },
       );
 
-      await expect(createProducer).rejects.toBeInstanceOf(BadRequestException);
+      await expect(createProducer).rejects.toBeInstanceOf(
+        InternalServerErrorException,
+      );
       await expect(createProducer).rejects.toThrow(
         'O produtor informado não existe.',
       );

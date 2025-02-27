@@ -14,15 +14,13 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
-      whitelist: true,
-      forbidNonWhitelisted: true,
     }),
   );
 
   const config = new DocumentBuilder()
     .setTitle('API BrainAg')
     .setDescription(
-      'Documentação OpenAPI para caso de uso do serviço de controle de produção de parceiros agros',
+      'OpenAPI documentation for the agriculture production control service use case',
     )
     .setVersion('1.0')
     .build();

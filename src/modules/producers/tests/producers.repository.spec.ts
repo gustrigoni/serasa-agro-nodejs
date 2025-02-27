@@ -1,5 +1,5 @@
 import { Test } from '@nestjs/testing';
-import { PrismaService } from './../../../prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import { ProducersRepository } from '../producers.repository';
 import { Producer } from '@prisma/client';
 import { SaveProducerDto } from '../dto/saveProducer.dto';
