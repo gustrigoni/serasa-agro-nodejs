@@ -18,7 +18,7 @@ export class ProducersService {
     const producerData = await this.producersRepository
       .createProducer({ fullName, document })
       .catch((error) => {
-        this.logger.error('Ocorreu um erro ao tentar criar um produtor');
+        this.logger.error('There was an error trying to create a producer');
 
         throw new BadRequestException(
           'Não foi possível criar este produtor, tente novamente.',
