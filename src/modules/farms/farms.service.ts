@@ -130,13 +130,68 @@ export class FarmsService {
   }
 
   async listFarmsCultivations(): Promise<ListFarmsCultivations> {
-    const promiseCountFarms = this.farmsRepository.countFarms();
-    const promiseCountFarmsByState = this.farmsRepository.countFarmsByState();
-    const promiseCountFarmsCultivations =
-      this.farmsRepository.countFarmsCultivations();
-    const promiseSumFarmsTotalArea = this.farmsRepository.sumFarmsTotalArea();
-    const promiseSumFarmsCultivableAndPreservationAreas =
-      this.farmsRepository.sumFarmsCultivableAndPreservationAreas();
+    const promiseCountFarms = this.farmsRepository
+      .countFarms()
+      .catch((error) => {
+        this.logger.error(
+          'There was an error trying to count farms has been created.',
+        );
+
+        throw new BadRequestException(
+          'Ocorreu um erro ao tentar contabilizar as propriedades criadas.',
+          { cause: error },
+        );
+      });
+
+    const promiseCountFarmsByState = this.farmsRepository
+      .countFarmsByState()
+      .catch((error) => {
+        this.logger.error(
+          'There was an error trying to count farms has been created by states.',
+        );
+
+        throw new BadRequestException(
+          'Ocorreu um erro ao tentar contabilizar as propriedades criadas por estados.',
+          { cause: error },
+        );
+      });
+
+    const promiseCountFarmsCultivations = this.farmsRepository
+      .countFarmsCultivations()
+      .catch((error) => {
+        this.logger.error(
+          'There was an error trying to count farms cultivations.',
+        );
+
+        throw new BadRequestException(
+          'Ocorreu um erro ao tentar contabilizar as culturas de cultivo.',
+          { cause: error },
+        );
+      });
+
+    const promiseSumFarmsTotalArea = this.farmsRepository
+      .sumFarmsTotalArea()
+      .catch((error) => {
+        this.logger.error('There was an error trying to sum farms total area.');
+
+        throw new BadRequestException(
+          'Ocorreu um erro ao tentar contabilizar área total das propriedades criadas.',
+          { cause: error },
+        );
+      });
+
+    const promiseSumFarmsCultivableAndPreservationAreas = this.farmsRepository
+      .sumFarmsCultivableAndPreservationAreas()
+      .catch((error) => {
+        this.logger.error(
+          'There was an error trying to sum farms cultivable and preservation areas.',
+        );
+
+        throw new BadRequestException(
+          'Ocorreu um erro ao tentar contabilizar as áreas de cultivo e preservação das propriedades.',
+          { cause: error },
+        );
+      });
 
     const [
       totalFarmsCount,
