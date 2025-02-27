@@ -46,7 +46,7 @@ export class FarmsController {
       });
   }
 
-  @Get('/statistic')
+  @Get('/statistics')
   @Version('1')
   @HttpCode(HttpStatus.OK)
   listFarmsCultivations(): Promise<ListFarmsCultivations> {
