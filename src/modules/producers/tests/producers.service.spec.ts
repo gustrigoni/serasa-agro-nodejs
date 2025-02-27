@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { ProducersService } from '../producers.service';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, Logger } from '@nestjs/common';
 import { SaveProducerDto } from '../dto/saveProducer.dto';
 import { Producer } from '@prisma/client';
 import { ProducersRepository } from '../producers.repository';
@@ -65,7 +65,21 @@ describe('ProducersService', () => {
 
   beforeEach(async () => {
     const testingModule = await Test.createTestingModule({
-      providers: [ProducersService, ProducersRepository, PrismaService],
+      providers: [
+        ProducersService,
+        ProducersRepository,
+        PrismaService,
+        {
+          provide: Logger,
+          useValue: {
+            log: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+            verbose: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     producersService = testingModule.get<ProducersService>(ProducersService);

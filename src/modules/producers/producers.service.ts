@@ -5,9 +5,10 @@ import { ProducersRepository } from './producers.repository';
 
 @Injectable()
 export class ProducersService {
-  private readonly logger = new Logger(ProducersService.name);
-
-  constructor(private producersRepository: ProducersRepository) {}
+  constructor(
+    private producersRepository: ProducersRepository,
+    private readonly logger: Logger = new Logger(ProducersService.name),
+  ) {}
 
   async createProducer({
     fullName,

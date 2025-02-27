@@ -8,11 +8,10 @@ import { ListFarmsCultivations } from './dto/listFarmsCultivations.dto';
 
 @Injectable()
 export class FarmsService {
-  private readonly logger: Logger = new Logger(FarmsService.name);
-
   constructor(
     private producersRepository: ProducersRepository,
     private farmsRepository: FarmsRepository,
+    private readonly logger: Logger = new Logger(FarmsService.name),
   ) {}
 
   async createFarm({

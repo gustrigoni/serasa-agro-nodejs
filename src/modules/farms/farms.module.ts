@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { FarmsController } from './farms.controller';
 import { FarmsService } from './farms.service';
 import { ProducersRepository } from '../producers/producers.repository';
@@ -12,6 +12,7 @@ import { PrismaService } from './../../prisma.service';
     FarmsService,
     ProducersRepository,
     FarmsRepository,
+    Logger,
   ],
   exports: [FarmsService],
 })
