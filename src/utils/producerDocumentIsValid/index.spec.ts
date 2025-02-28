@@ -1,6 +1,11 @@
 import { producerDocumentIsValid } from '.';
 
 describe('producerDocumentIsValid', () => {
+  it('The producerDocumentIsValid need to be a function', () => {
+    expect(producerDocumentIsValid).toBeDefined();
+    expect(typeof producerDocumentIsValid).toBe('function');
+  });
+
   describe('CPF validation', () => {
     it('The CPF validation need to return true when the data is a valid CPF number', () => {
       const producerDocument = '46751972059';
