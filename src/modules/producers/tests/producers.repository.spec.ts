@@ -3,51 +3,52 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { ProducersRepository } from '../producers.repository';
 import { Producer } from '@prisma/client';
 import { SaveProducerDto } from '../dto/saveProducer.dto';
-
-const producersList = [
-  {
-    id: 1,
-    fullName: 'Gustavo Egidio Rigoni',
-    document: '74311717000190',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: 2,
-    fullName: 'Maria Graça de Souza',
-    document: '59035178033',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-];
-
-const mockProducersRepositoryFindProducerById = (producerId: number) => {
-  const producer =
-    producersList.find((producer) => producer.id === producerId) || null;
-
-  return producer;
-};
-
-const mockProducersRepositoryFindProducerDocumetHasAlreadyUsed = (
-  producerId: number | undefined = undefined,
-  producerDocument: string,
-) => {
-  const producer =
-    producersList.find((producer) => {
-      if (producerId) {
-        return (
-          producer.document === producerDocument && producer.id !== producerId
-        );
-      }
-      return producer.document === producerDocument;
-    }) || null;
-
-  return producer;
-};
+import { ProducerEntityDto } from 'src/modules/prisma/dto/producer.entity.dto';
 
 describe('ProducersRepository', () => {
   let producersRepository: ProducersRepository;
   let prismaService: PrismaService;
+
+  const producersList: Producer[] = [
+    {
+      id: 1,
+      fullName: 'Gustavo Egidio Rigoni',
+      document: '74311717000190',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: 2,
+      fullName: 'Maria Graça de Souza',
+      document: '59035178033',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  ];
+
+  const mockProducersRepositoryFindProducerById = (producerId: number) => {
+    const producer =
+      producersList.find((producer) => producer.id === producerId) || null;
+
+    return producer;
+  };
+
+  const mockProducersRepositoryFindProducerDocumetHasAlreadyUsed = (
+    producerId: number | undefined = undefined,
+    producerDocument: string,
+  ) => {
+    const producer =
+      producersList.find((producer) => {
+        if (producerId) {
+          return (
+            producer.document === producerDocument && producer.id !== producerId
+          );
+        }
+        return producer.document === producerDocument;
+      }) || null;
+
+    return producer;
+  };
 
   beforeEach(async () => {
     const testingModule = await Test.createTestingModule({
@@ -59,72 +60,74 @@ describe('ProducersRepository', () => {
     prismaService = testingModule.get<PrismaService>(PrismaService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('ProducersRepository need to be defined', () => {
     expect(producersRepository).toBeDefined();
   });
 
   describe('Create producer', () => {
-    it(`The method createProducer need to return a valid producer's data`, async () => {
-      const producerData: SaveProducerDto = {
-        fullName: 'Gustavo Egidio Rigoni',
-        document: '36339334091',
-      };
-
-      const resultCreatedProducerData: Producer = {
-        id: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        ...producerData,
-      };
-
-      jest
-        .spyOn(prismaService.producer, 'create')
-        .mockResolvedValue(resultCreatedProducerData);
-
-      const createdProducerData = producersRepository.createProducer({
-        fullName: producerData.fullName,
-        document: producerData.document,
-      });
-
-      await expect(createdProducerData).resolves.toBeDefined();
-      await expect(createdProducerData).resolves.toBe(
-        resultCreatedProducerData,
-      );
-    });
-
-    it(`The method createProducer need to throw an error when prisma throws an error`, async () => {
-      const producerData: SaveProducerDto = {
-        fullName: 'Gustavo Egidio Rigoni',
-        document: '36339334091',
-      };
-
-      jest
-        .spyOn(prismaService.producer, 'create')
-        .mockRejectedValue('Prisma throws an error');
-
-      const createdProducerData = producersRepository.createProducer({
-        fullName: producerData.fullName,
-        document: producerData.document,
-      });
-
-      await expect(createdProducerData).rejects.toBeDefined();
-      await expect(createdProducerData).rejects.toBe('Prisma throws an error');
-    });
-  });
-
-  describe('Update producer', () => {
-    it(`The method updateProducer need to return a valid new fresh producer's data`, async () => {
-      const producerId: number | undefined = 1;
-
+    it(`The method createProducer need to return a valid producer's data when it has been created`, async () => {
       const producerData: SaveProducerDto = {
         fullName: 'Gustavo Egidio Rigoni',
         document: '74311717000190',
       };
 
-      const resultUpdatedProducerData: Producer = {
-        id: producerId,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+      const resultCreateProducerData = {
+        ...producersList[0],
+        ...producerData,
+      };
+
+      jest
+        .spyOn(prismaService.producer, 'create')
+        .mockResolvedValue(producersList[0]);
+
+      const createdProducerData: Promise<Producer> =
+        producersRepository.createProducer({
+          fullName: producerData.fullName,
+          document: producerData.document,
+        });
+
+      await expect(createdProducerData).resolves.toBeDefined();
+      await expect(createdProducerData).resolves.toStrictEqual(
+        resultCreateProducerData,
+      );
+    });
+
+    it(`The method createProducer need to throw an error due Prisma thrown an error`, async () => {
+      const producerData: SaveProducerDto = {
+        fullName: 'Gustavo Egidio Rigoni',
+        document: '36339334091',
+      };
+
+      jest.spyOn(prismaService.producer, 'create').mockImplementation(() => {
+        throw new Error();
+      });
+
+      const createdProducerData: Promise<Producer> =
+        producersRepository.createProducer({
+          fullName: producerData.fullName,
+          document: producerData.document,
+        });
+
+      await expect(createdProducerData).rejects.toBeDefined();
+      await expect(createdProducerData).rejects.toThrow();
+    });
+  });
+
+  describe('Update producer', () => {
+    it(`The method updateProducer need to return the producer data when it has updated successfully`, async () => {
+      const producerId: number | undefined = 1;
+
+      const producerData: SaveProducerDto = {
+        fullName: 'Gustavo Egidio Rigoni',
+        document: '36339334091',
+      };
+
+      const resultUpdatedProducerData: ProducerEntityDto = {
+        ...producersList[0],
         ...producerData,
       };
 
@@ -132,19 +135,19 @@ describe('ProducersRepository', () => {
         .spyOn(prismaService.producer, 'update')
         .mockResolvedValue(resultUpdatedProducerData);
 
-      const updateProducerData = producersRepository.updateProducer(
-        producerId,
-        {
+      const updateProducerData: Promise<Producer> =
+        producersRepository.updateProducer(producerId, {
           fullName: producerData.fullName,
           document: producerData.document,
-        },
-      );
+        });
 
-      expect(updateProducerData).toBeDefined();
-      await expect(updateProducerData).resolves.toBe(resultUpdatedProducerData);
+      await expect(updateProducerData).resolves.toBeDefined();
+      await expect(updateProducerData).resolves.toStrictEqual(
+        resultUpdatedProducerData,
+      );
     });
 
-    it(`The method updateProducer need to throw an error when prisma throws an error`, async () => {
+    it(`The method updateProducer need to throw an error due Prisma thrown an error`, async () => {
       const producerId: number | undefined = 1;
 
       const producerData: SaveProducerDto = {
@@ -152,105 +155,119 @@ describe('ProducersRepository', () => {
         document: '36339334091',
       };
 
-      jest
-        .spyOn(prismaService.producer, 'update')
-        .mockRejectedValue('Prisma throws an error');
+      jest.spyOn(prismaService.producer, 'update').mockImplementation(() => {
+        throw new Error();
+      });
 
-      const updatedProducerData = producersRepository.updateProducer(
-        producerId,
-        {
+      const updatedProducerData: Promise<Producer> =
+        producersRepository.updateProducer(producerId, {
           fullName: producerData.fullName,
           document: producerData.document,
-        },
-      );
+        });
 
       await expect(updatedProducerData).rejects.toBeDefined();
-      await expect(updatedProducerData).rejects.toBe('Prisma throws an error');
+      await expect(updatedProducerData).rejects.toThrow();
     });
   });
 
   describe('Remove producer', () => {
-    it(`The method removeProducer need to return a valid producer's data that was removed`, async () => {
+    it(`The method removeProducer need to return the producer data when it has removed successfully`, async () => {
       const producerId: number | undefined = 1;
 
-      const resultRemovedProducerData: Producer = {
-        id: producerId,
-        fullName: 'Gustavo Egidio Rigoni',
-        document: '74311717000190',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+      const resultRemovedProducerData: ProducerEntityDto = {
+        ...producersList[0],
       };
 
       jest
         .spyOn(prismaService.producer, 'delete')
         .mockResolvedValue(resultRemovedProducerData);
 
-      const removeProducerData = producersRepository.removeProducer(producerId);
+      const removeProducerData: Promise<Producer> =
+        producersRepository.removeProducer(producerId);
 
-      expect(removeProducerData).toBeDefined();
-      await expect(removeProducerData).resolves.toBe(resultRemovedProducerData);
+      await expect(removeProducerData).resolves.toBeDefined();
+      await expect(removeProducerData).resolves.toStrictEqual(
+        resultRemovedProducerData,
+      );
     });
 
-    it(`The method removeProducer need to throw an error when prisma throws an error`, async () => {
+    it(`The method removeProducer need to throw an error due Prisma thrown an error`, async () => {
       const producerId: number | undefined = 1;
 
-      jest
-        .spyOn(prismaService.producer, 'delete')
-        .mockRejectedValue('Prisma throws an error');
+      jest.spyOn(prismaService.producer, 'delete').mockImplementation(() => {
+        throw new Error();
+      });
 
-      const removeProducerData = producersRepository.removeProducer(producerId);
+      const removeProducerData: Promise<Producer> =
+        producersRepository.removeProducer(producerId);
 
       await expect(removeProducerData).rejects.toBeDefined();
-      await expect(removeProducerData).rejects.toBe('Prisma throws an error');
+      await expect(removeProducerData).rejects.toThrow();
     });
   });
 
   describe('Find producer by id', () => {
-    it(`The method findProducerById need to return a producer's data when producer is found`, async () => {
+    it(`The method findProducerById need to return a producer data when it has found`, async () => {
       const producerId: number | undefined = 1;
+
+      const resultFindProducerData: ProducerEntityDto = {
+        ...producersList[0],
+      };
 
       jest
         .spyOn(prismaService.producer, 'findUnique')
         .mockResolvedValue(mockProducersRepositoryFindProducerById(producerId));
 
-      const findProducerData = producersRepository.findProducerById(producerId);
+      const findProducerData: Promise<Producer | null> =
+        producersRepository.findProducerById(producerId);
 
-      expect(findProducerData).toBeDefined();
+      await expect(findProducerData).resolves.toBeDefined();
       await expect(findProducerData).resolves.not.toBeNull();
+      await expect(findProducerData).resolves.toStrictEqual(
+        resultFindProducerData,
+      );
     });
 
-    it(`The method findProducerById need to return null when producer is not found`, async () => {
+    it(`The method findProducerById need to return null when it has not found`, async () => {
       const producerId: number | undefined = -1;
 
       jest
         .spyOn(prismaService.producer, 'findUnique')
         .mockResolvedValue(mockProducersRepositoryFindProducerById(producerId));
 
-      const findProducerData = producersRepository.findProducerById(producerId);
+      const findProducerData: Promise<Producer | null> =
+        producersRepository.findProducerById(producerId);
 
-      expect(findProducerData).toBeDefined();
+      await expect(findProducerData).resolves.toBeDefined();
       await expect(findProducerData).resolves.toBeNull();
     });
 
-    it(`The method findProducerById need to throw an error when prisma throws an error`, async () => {
+    it(`The method findProducerById need to throw an error due Prisma thrown an error`, async () => {
       const producerId: number | undefined = 1;
 
       jest
         .spyOn(prismaService.producer, 'findUnique')
-        .mockRejectedValue('Prisma throws an error');
+        .mockImplementation(() => {
+          throw new Error();
+        });
 
-      const findProducerData = producersRepository.findProducerById(producerId);
+      const findProducerData: Promise<Producer | null> =
+        producersRepository.findProducerById(producerId);
 
       await expect(findProducerData).rejects.toBeDefined();
-      await expect(findProducerData).rejects.toBe('Prisma throws an error');
+      await expect(findProducerData).rejects.toThrow();
     });
   });
 
   describe('Find producer by document', () => {
-    it(`The method findProducerDocumetHasAlreadyUsed need to return a valid producer's data`, async () => {
+    it(`The method findProducerDocumetHasAlreadyUsed need to return a valid producer data when it has found`, async () => {
       const producerId: number | undefined = undefined;
       const producerDocument: string = '74311717000190';
 
+      const resultFindProducersData: ProducerEntityDto = {
+        ...producersList[0],
+      };
+
       jest
         .spyOn(prismaService.producer, 'findUnique')
         .mockResolvedValue(
@@ -260,19 +277,22 @@ describe('ProducersRepository', () => {
           ),
         );
 
-      const findProducerData =
+      const findProducerData: Promise<Producer | null> =
         producersRepository.findProducerDocumetHasAlreadyUsed(
           producerId,
           producerDocument,
         );
 
-      expect(findProducerData).toBeDefined();
+      await expect(findProducerData).resolves.toBeDefined();
       await expect(findProducerData).resolves.not.toBeNull();
+      await expect(findProducerData).resolves.toStrictEqual(
+        resultFindProducersData,
+      );
     });
 
-    it(`The method findProducerDocumetHasAlreadyUsed need to return null when producer is not found`, async () => {
-      const producerId: number | undefined = 1;
-      const producerDocument = '74311717000190';
+    it(`The method findProducerDocumetHasAlreadyUsed need to return null when it has not found`, async () => {
+      const producerId: number | undefined = undefined;
+      const producerDocument = '62236079036';
 
       jest
         .spyOn(prismaService.producer, 'findUnique')
@@ -283,23 +303,25 @@ describe('ProducersRepository', () => {
           ),
         );
 
-      const findProducerData =
+      const findProducerData: Promise<Producer | null> =
         producersRepository.findProducerDocumetHasAlreadyUsed(
           producerId,
           producerDocument,
         );
 
-      expect(findProducerData).toBeDefined();
+      await expect(findProducerData).resolves.toBeDefined();
       await expect(findProducerData).resolves.toBeNull();
     });
 
-    it(`The method findProducerDocumetHasAlreadyUsed need to throw an error when prisma throws an error`, async () => {
+    it(`The method findProducerDocumetHasAlreadyUsed need to throw an error due Prisma thrown an error`, async () => {
       const producerId: number | undefined = 1;
       const producerDocument = '74311717000190';
 
       jest
         .spyOn(prismaService.producer, 'findUnique')
-        .mockRejectedValue('Prisma throws an error');
+        .mockImplementation(() => {
+          throw new Error();
+        });
 
       const findProducerData =
         producersRepository.findProducerDocumetHasAlreadyUsed(
@@ -308,7 +330,7 @@ describe('ProducersRepository', () => {
         );
 
       await expect(findProducerData).rejects.toBeDefined();
-      await expect(findProducerData).rejects.toBe('Prisma throws an error');
+      await expect(findProducerData).rejects.toThrow();
     });
   });
 });
