@@ -4,7 +4,7 @@ import { IsNotEmpty, IsNumber, Matches, MaxLength, Min } from 'class-validator';
 export class SaveFarmCultivationDto {
   @ApiProperty({
     example: 'Feijão Vermelho',
-    description: `Farm cultivation name`,
+    description: `Cultivation name`,
   })
   @IsNotEmpty({
     message: 'Nome da cultura de cultivação precisa ser informado.',

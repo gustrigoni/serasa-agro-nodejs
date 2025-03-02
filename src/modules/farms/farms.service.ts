@@ -99,16 +99,13 @@ export class FarmsService {
       throw new BadRequestException('A propriedade informada não existe.');
     }
 
-    const sumCultivableAreaAndPreserverdArea = new Prisma.Decimal(
+    const farmCultivationHasNotEnoughAreaCultivable = new Prisma.Decimal(
       farmCultivation,
-    ).plus(new Prisma.Decimal(cultivatedArea));
+    )
+      .plus(new Prisma.Decimal(cultivatedArea))
+      .greaterThan(farm.cultivableArea);
 
-    const areaTotalIsGreatherThaSumCultivableAreaAndPreserverdArea =
-      new Prisma.Decimal(sumCultivableAreaAndPreserverdArea).greaterThan(
-        farm.totalArea,
-      );
-
-    if (areaTotalIsGreatherThaSumCultivableAreaAndPreserverdArea) {
+    if (farmCultivationHasNotEnoughAreaCultivable) {
       throw new BadRequestException(
         'A propriedade não possui esta área para cultivo.',
       );
@@ -122,9 +119,7 @@ export class FarmsService {
         harvest,
       })
       .catch((error) => {
-        this.logger.error(
-          'There was an error trying to create a farm cultivation.',
-        );
+        this.logger.error('There was an error trying to create a cultivation.');
 
         throw new InternalServerErrorException(
           'Não foi possível criar este cultivo, tente novamente.',
@@ -135,7 +130,7 @@ export class FarmsService {
     return farmCultivationData;
   }
 
-  async listFarmsCultivations(): Promise<ListFarmsCultivationsDto> {
+  async listFarmsCultivationsStatistics(): Promise<ListFarmsCultivationsDto> {
     const promiseCountFarms = this.farmsRepository
       .countFarms()
       .catch((error) => {

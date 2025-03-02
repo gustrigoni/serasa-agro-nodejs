@@ -5,7 +5,7 @@ export class FarmCultivationEntityDto
   implements Omit<FarmCultivation, 'cultivatedArea'>
 {
   @ApiProperty({
-    description: "The farm cultivation's unique identifier number",
+    description: "The cultivation's unique identifier number",
   })
   @ApiResponseProperty({
     example: 1,
@@ -13,7 +13,7 @@ export class FarmCultivationEntityDto
   readonly id: number;
 
   @ApiProperty({
-    description: 'The farm cultivation name',
+    description: 'The cultivation name',
   })
   @ApiResponseProperty({
     example: 'Feijão Vermelho',

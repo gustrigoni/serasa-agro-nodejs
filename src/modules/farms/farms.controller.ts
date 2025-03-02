@@ -53,14 +53,14 @@ export class FarmsController {
   @Version('1')
   @HttpCode(HttpStatus.CREATED)
   @ApiCreatedResponse({
-    description: 'Farm cultivation has been created successfully',
+    description: 'Cultivation has been created successfully',
     type: FarmCultivationEntityDto,
   })
   @ApiBadRequestResponse({
-    description: `Was not possible validate the farm cultivtion's data informed`,
+    description: `Was not possible validate the cultivtion's data informed`,
   })
   @ApiInternalServerErrorResponse({
-    description: `Was not possible to create a farm cultivation due to an internal error`,
+    description: `Was not possible to create a cultivation due to an internal error`,
   })
   async createFarmCultivation(
     @Body() saveFarmCultivationDto: SaveFarmCultivationDto,
@@ -68,7 +68,7 @@ export class FarmsController {
     return this.farmService
       .createFarmCultivation(saveFarmCultivationDto)
       .catch((error) => {
-        this.logger.warn('It was not possible to create a farm!', error);
+        this.logger.warn('It was not possible to create a cultivation!', error);
 
         throw error;
       });
@@ -78,15 +78,18 @@ export class FarmsController {
   @Version('1')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
-    description: 'Farm cultivations statistics has been listed successfully',
+    description: 'Cultivations statistics has been listed successfully',
     type: ListFarmsCultivationsDto,
   })
   @ApiInternalServerErrorResponse({
-    description: `Was not possible to get farms cultivations' statistics due to an internal error`,
+    description: `Was not possible to get cultivations' statistics due to an internal error`,
   })
-  listFarmsCultivations(): Promise<ListFarmsCultivationsDto> {
-    return this.farmService.listFarmsCultivations().catch((error) => {
-      this.logger.warn('It was not possible to create a farm!', error);
+  listFarmsCultivationsStatistics(): Promise<ListFarmsCultivationsDto> {
+    return this.farmService.listFarmsCultivationsStatistics().catch((error) => {
+      this.logger.warn(
+        'It was not possible to get farms and cultivations statistics!',
+        error,
+      );
 
       throw error;
     });

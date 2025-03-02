@@ -130,6 +130,7 @@ export class FarmsRepository {
         preservedArea: true,
       },
     });
+
     return {
       cultivableArea: farmData?._sum?.cultivableArea || null,
       preservedArea: farmData?._sum?.preservedArea || null,
