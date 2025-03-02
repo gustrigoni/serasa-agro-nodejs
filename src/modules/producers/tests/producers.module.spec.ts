@@ -12,10 +12,6 @@ describe('ProducersModule', () => {
     }).compile();
   });
 
-  it('Producers module need to be defined', () => {
-    expect(module).toBeDefined();
-  });
-
   it('ProducersService need to be defined', () => {
     const service = producersModule.get<ProducersService>(ProducersService);
     expect(service).toBeDefined();

@@ -102,9 +102,7 @@ describe('ProducersRepository', () => {
         document: '36339334091',
       };
 
-      jest.spyOn(prismaService.producer, 'create').mockImplementation(() => {
-        throw new Error();
-      });
+      prismaService.producer.create = jest.fn().mockRejectedValue(new Error());
 
       const createdProducerData: Promise<Producer> =
         producersRepository.createProducer({
@@ -155,9 +153,7 @@ describe('ProducersRepository', () => {
         document: '36339334091',
       };
 
-      jest.spyOn(prismaService.producer, 'update').mockImplementation(() => {
-        throw new Error();
-      });
+      prismaService.producer.update = jest.fn().mockRejectedValue(new Error());
 
       const updatedProducerData: Promise<Producer> =
         producersRepository.updateProducer(producerId, {
@@ -194,9 +190,7 @@ describe('ProducersRepository', () => {
     it(`The method removeProducer need to throw an error due Prisma thrown an error`, async () => {
       const producerId: number | undefined = 1;
 
-      jest.spyOn(prismaService.producer, 'delete').mockImplementation(() => {
-        throw new Error();
-      });
+      prismaService.producer.delete = jest.fn().mockRejectedValue(new Error());
 
       const removeProducerData: Promise<Producer> =
         producersRepository.removeProducer(producerId);
@@ -247,9 +241,7 @@ describe('ProducersRepository', () => {
 
       jest
         .spyOn(prismaService.producer, 'findUnique')
-        .mockImplementation(() => {
-          throw new Error();
-        });
+        .mockRejectedValue(new Error());
 
       const findProducerData: Promise<Producer | null> =
         producersRepository.findProducerById(producerId);
@@ -319,9 +311,7 @@ describe('ProducersRepository', () => {
 
       jest
         .spyOn(prismaService.producer, 'findUnique')
-        .mockImplementation(() => {
-          throw new Error();
-        });
+        .mockRejectedValue(new Error());
 
       const findProducerData =
         producersRepository.findProducerDocumetHasAlreadyUsed(

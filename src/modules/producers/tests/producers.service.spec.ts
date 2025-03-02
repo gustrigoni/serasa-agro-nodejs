@@ -31,42 +31,6 @@ describe('ProducersService', () => {
     },
   ];
 
-  const mockProducersRepositoryFindProducerById = ({
-    producersRepository,
-    producerId,
-  }) => {
-    return jest
-      .spyOn(producersRepository, 'findProducerById')
-      .mockImplementation(() => {
-        const producer =
-          producersList.find((producer) => producer.id === producerId) || null;
-
-        return Promise.resolve(producer);
-      });
-  };
-
-  const mockProducersRepositoryFindProducerDocumetHasAlreadyUsed = (
-    { producersRepository, producerDocument },
-    producerId: number | undefined = undefined,
-  ) => {
-    return jest
-      .spyOn(producersRepository, 'findProducerDocumetHasAlreadyUsed')
-      .mockImplementation(() => {
-        const producer =
-          producersList.find((producer) => {
-            if (producerId) {
-              return (
-                producer.document === producerDocument &&
-                producer.id !== producerId
-              );
-            }
-            return producer.document === producerDocument;
-          }) || null;
-
-        return Promise.resolve(producer);
-      });
-  };
-
   beforeEach(async () => {
     const testingModule = await Test.createTestingModule({
       providers: [
@@ -110,10 +74,16 @@ describe('ProducersService', () => {
         document: '59035178033',
       };
 
-      mockProducersRepositoryFindProducerDocumetHasAlreadyUsed({
-        producersRepository,
-        producerDocument: producerData.document,
-      });
+      jest
+        .spyOn(
+          producersService,
+          'throwExceptionIfUserAlreadyExistsByDocument' as any,
+        )
+        .mockRejectedValue(
+          new BadRequestException(
+            'Já existe um produtor cadastrado com este CPF/CNPJ.',
+          ),
+        );
 
       const createProducer = producersService.createProducer(producerData);
 
@@ -123,54 +93,49 @@ describe('ProducersService', () => {
       );
     });
 
-    it(`The method createProducer need to save a producer when producer's info is correct`, async () => {
+    it('The method createProducer need to throw a InternalServerErrorException due an unexpected error in repository findProducerDocumetHasAlreadyUsed method', async () => {
       const producerData: SaveProducerDto = {
         fullName: 'Gustavo Egidio Rigoni',
         document: '20718888000100',
       };
 
-      const resultProducerData: Producer = {
-        id: 99,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        ...producerData,
-      };
-
-      mockProducersRepositoryFindProducerDocumetHasAlreadyUsed({
-        producersRepository,
-        producerDocument: producerData.document,
-      });
-
       jest
-        .spyOn(producersRepository, 'createProducer')
-        .mockImplementation(() => {
-          return Promise.resolve(resultProducerData);
-        });
+        .spyOn(
+          producersService,
+          'throwExceptionIfUserAlreadyExistsByDocument' as any,
+        )
+        .mockRejectedValue(
+          new InternalServerErrorException(
+            'Não foi possível verificar se o documento informado é válido.',
+          ),
+        );
 
       const createProducer = producersService.createProducer(producerData);
 
-      await expect(createProducer).resolves.toBe(resultProducerData);
-      await expect(createProducer).resolves.not.toBeInstanceOf(
-        BadRequestException,
+      await expect(createProducer).rejects.toBeInstanceOf(
+        InternalServerErrorException,
+      );
+      await expect(createProducer).rejects.toThrow(
+        'Não foi possível verificar se o documento informado é válido.',
       );
     });
 
-    it(`The method createProducer need to throw an InternalServerErrorException when prisma can't remove the data`, async () => {
+    it('The method createProducer need to throw a InternalServerErrorException due an unexpected error in repository createProducer method', async () => {
       const producerData: SaveProducerDto = {
         fullName: 'Gustavo Egidio Rigoni',
         document: '20718888000100',
       };
 
-      mockProducersRepositoryFindProducerDocumetHasAlreadyUsed({
-        producersRepository,
-        producerDocument: producerData.document,
-      });
-
       jest
-        .spyOn(producersRepository, 'createProducer')
-        .mockImplementation(() => {
-          return Promise.reject(new Error('Ops!'));
-        });
+        .spyOn(
+          producersService,
+          'throwExceptionIfUserAlreadyExistsByDocument' as any,
+        )
+        .mockResolvedValue(undefined);
+
+      producersRepository.createProducer = jest
+        .fn()
+        .mockRejectedValue(new Error());
 
       const createProducer = producersService.createProducer(producerData);
 
@@ -181,10 +146,45 @@ describe('ProducersService', () => {
         'Não foi possível criar este produtor, tente novamente.',
       );
     });
+
+    it('The method createProducer need to return the new producer data when it has been created successfully', async () => {
+      const producerData: SaveProducerDto = {
+        fullName: 'Gustavo Egidio Rigoni',
+        document: '20718888000100',
+      };
+
+      const mockResultRepositoryProducerData: Producer = {
+        id: 99,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        ...producerData,
+      };
+
+      jest
+        .spyOn(
+          producersService,
+          'throwExceptionIfUserAlreadyExistsByDocument' as any,
+        )
+        .mockResolvedValue(undefined);
+
+      producersRepository.createProducer = jest
+        .fn()
+        .mockResolvedValue(mockResultRepositoryProducerData);
+
+      const resultCreateProducer =
+        producersService.createProducer(producerData);
+
+      await expect(resultCreateProducer).resolves.toBe(
+        mockResultRepositoryProducerData,
+      );
+      await expect(resultCreateProducer).resolves.not.toBeInstanceOf(
+        BadRequestException,
+      );
+    });
   });
 
   describe('Update Producer', () => {
-    it(`The method updateProducer need to throw a BadRequestException when producer's id not exists`, async () => {
+    it(`The method updateProducer need to throw a BadRequestException when producer's document already exists`, async () => {
       const producerId: number = -1;
 
       const producerData: SaveProducerDto = {
@@ -192,23 +192,31 @@ describe('ProducersService', () => {
         document: '74311717000190',
       };
 
-      mockProducersRepositoryFindProducerDocumetHasAlreadyUsed(
-        { producersRepository, producerDocument: producerData.document },
-        producerId,
-      );
+      jest
+        .spyOn(
+          producersService,
+          'throwExceptionIfUserAlreadyExistsByDocument' as any,
+        )
+        .mockResolvedValue(null);
 
-      mockProducersRepositoryFindProducerById({
-        producersRepository,
-        producerId,
-      });
+      jest
+        .spyOn(
+          producersService,
+          'throwExceptionIfUserNotExistsByProducerId' as any,
+        )
+        .mockRejectedValue(
+          new BadRequestException('O produtor informado não existe.'),
+        );
 
-      const updateProducer = producersService.updateProducer(
+      const resultUpdateProducer = producersService.updateProducer(
         producerId,
         producerData,
       );
 
-      await expect(updateProducer).rejects.toBeInstanceOf(BadRequestException);
-      await expect(updateProducer).rejects.toThrow(
+      await expect(resultUpdateProducer).rejects.toBeInstanceOf(
+        BadRequestException,
+      );
+      await expect(resultUpdateProducer).rejects.toThrow(
         'O produtor informado não existe.',
       );
     });
@@ -221,28 +229,38 @@ describe('ProducersService', () => {
         document: '59035178033',
       };
 
-      mockProducersRepositoryFindProducerById({
-        producersRepository,
-        producerId,
-      });
+      jest
+        .spyOn(
+          producersService,
+          'throwExceptionIfUserNotExistsByProducerId' as any,
+        )
+        .mockResolvedValue(undefined);
 
-      mockProducersRepositoryFindProducerDocumetHasAlreadyUsed(
-        { producersRepository, producerDocument: producerData.document },
-        producerId,
-      );
+      jest
+        .spyOn(
+          producersService,
+          'throwExceptionIfUserAlreadyExistsByDocument' as any,
+        )
+        .mockRejectedValue(
+          new BadRequestException(
+            'Já existe um produtor cadastrado com este CPF/CNPJ.',
+          ),
+        );
 
-      const updateProducer = producersService.updateProducer(
+      const resultUpdateProducer = producersService.updateProducer(
         producerId,
         producerData,
       );
 
-      await expect(updateProducer).rejects.toBeInstanceOf(BadRequestException);
-      await expect(updateProducer).rejects.toThrow(
+      await expect(resultUpdateProducer).rejects.toBeInstanceOf(
+        BadRequestException,
+      );
+      await expect(resultUpdateProducer).rejects.toThrow(
         'Já existe um produtor cadastrado com este CPF/CNPJ.',
       );
     });
 
-    it(`The method updateProducer need to update producer's data when info is correct`, async () => {
+    it('The method updateProducer need to throw a InternalServerErrorException due an unexpected error in repository findProducerById method', async () => {
       const producerId: number = 1;
 
       const producerData: SaveProducerDto = {
@@ -250,41 +268,28 @@ describe('ProducersService', () => {
         document: '74311717000190',
       };
 
-      mockProducersRepositoryFindProducerById({
-        producersRepository,
-        producerId,
-      });
+      producersRepository.findProducerById = jest
+        .fn()
+        .mockRejectedValue(new Error());
 
-      mockProducersRepositoryFindProducerDocumetHasAlreadyUsed(
-        { producersRepository, producerDocument: producerData.document },
-        producerId,
-      );
+      producersRepository.findProducerDocumetHasAlreadyUsed = jest
+        .fn()
+        .mockResolvedValue(undefined);
 
-      const resultProducerData: Producer = {
-        id: producerId,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        ...producerData,
-      };
-
-      jest
-        .spyOn(producersRepository, 'updateProducer')
-        .mockImplementation(() => {
-          return Promise.resolve(resultProducerData);
-        });
-
-      const updateProducer = producersService.updateProducer(
+      const resultUpdateProducer = producersService.updateProducer(
         producerId,
         producerData,
       );
 
-      await expect(updateProducer).resolves.toBe(resultProducerData);
-      await expect(updateProducer).resolves.not.toBeInstanceOf(
-        BadRequestException,
+      await expect(resultUpdateProducer).rejects.toBeInstanceOf(
+        InternalServerErrorException,
+      );
+      await expect(resultUpdateProducer).rejects.toThrow(
+        'Não foi possível verificar se o produtor informado é válido.',
       );
     });
 
-    it(`The method updateProducer need to throw a InternalServerErrorException when prisma can't remove the data`, async () => {
+    it('The method updateProducer need to throw a InternalServerErrorException due an unexpected error in repository findProducerDocumetHasAlreadyUsed method', async () => {
       const producerId: number = 1;
 
       const producerData: SaveProducerDto = {
@@ -292,21 +297,52 @@ describe('ProducersService', () => {
         document: '74311717000190',
       };
 
-      mockProducersRepositoryFindProducerById({
-        producersRepository,
-        producerId,
-      });
+      producersRepository.findProducerById = jest
+        .fn()
+        .mockResolvedValue(producersList[0]);
 
-      mockProducersRepositoryFindProducerDocumetHasAlreadyUsed(
-        { producersRepository, producerDocument: producerData.document },
+      producersRepository.findProducerDocumetHasAlreadyUsed = jest
+        .fn()
+        .mockRejectedValue(new Error());
+
+      const resultUpdateProducer = producersService.updateProducer(
         producerId,
+        producerData,
       );
 
+      await expect(resultUpdateProducer).rejects.toBeInstanceOf(
+        InternalServerErrorException,
+      );
+      await expect(resultUpdateProducer).rejects.toThrow(
+        'Não foi possível verificar se o documento informado é válido.',
+      );
+    });
+
+    it('The method updateProducer need to throw a InternalServerErrorException due an unexpected error in repository updateProducer method', async () => {
+      const producerId: number = 1;
+
+      const producerData: SaveProducerDto = {
+        fullName: 'Gustavo Egidio Rigoni',
+        document: '74311717000190',
+      };
+
       jest
-        .spyOn(producersRepository, 'updateProducer')
-        .mockImplementation(() => {
-          return Promise.reject(new Error('Ops!'));
-        });
+        .spyOn(
+          producersService,
+          'throwExceptionIfUserNotExistsByProducerId' as any,
+        )
+        .mockResolvedValue(undefined);
+
+      jest
+        .spyOn(
+          producersService,
+          'throwExceptionIfUserAlreadyExistsByDocument' as any,
+        )
+        .mockResolvedValue(undefined);
+
+      producersRepository.updateProducer = jest
+        .fn()
+        .mockRejectedValue(new Error());
 
       const updateProducer = producersService.updateProducer(
         producerId,
@@ -320,6 +356,50 @@ describe('ProducersService', () => {
         'Não foi possível atualizar este produtor, tente novamente.',
       );
     });
+
+    it('The method updateProducer need to return the new producer data when it has been updated successfully', async () => {
+      const producerId: number = 1;
+
+      const producerData: SaveProducerDto = {
+        fullName: 'Gustavo Egidio Rigoni',
+        document: '74311717000190',
+      };
+
+      const resultProducerData: Producer = {
+        id: producerId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        ...producerData,
+      };
+
+      jest
+        .spyOn(
+          producersService,
+          'throwExceptionIfUserNotExistsByProducerId' as any,
+        )
+        .mockResolvedValue(undefined);
+
+      jest
+        .spyOn(
+          producersService,
+          'throwExceptionIfUserAlreadyExistsByDocument' as any,
+        )
+        .mockResolvedValue(undefined);
+
+      producersRepository.updateProducer = jest
+        .fn()
+        .mockResolvedValue(resultProducerData);
+
+      const updateProducer = producersService.updateProducer(
+        producerId,
+        producerData,
+      );
+
+      await expect(updateProducer).resolves.toBe(resultProducerData);
+      await expect(updateProducer).resolves.not.toBeInstanceOf(
+        BadRequestException,
+      );
+    });
   });
 
   describe('Remove Producer', () => {
@@ -331,10 +411,7 @@ describe('ProducersService', () => {
         document: '21823562563',
       };
 
-      mockProducersRepositoryFindProducerById({
-        producersRepository,
-        producerId,
-      });
+      producersRepository.findProducerById = jest.fn().mockResolvedValue(null);
 
       const updateProducer = producersService.updateProducer(
         producerId,
@@ -347,7 +424,50 @@ describe('ProducersService', () => {
       );
     });
 
-    it(`The method removeProducer need to remove producer and return removed data when producer's id exists`, async () => {
+    it('The method removeProducer need to throw a InternalServerErrorException due an unexpected error in repository findProducerById method', async () => {
+      const producerId: number = 1;
+
+      producersRepository.findProducerById = jest
+        .fn()
+        .mockRejectedValue(new Error());
+
+      const resultRemoveProducerData =
+        producersService.removeProducer(producerId);
+
+      await expect(resultRemoveProducerData).rejects.toBeInstanceOf(
+        InternalServerErrorException,
+      );
+      await expect(resultRemoveProducerData).rejects.toThrow(
+        'Não foi possível verificar se o produtor informado é válido.',
+      );
+    });
+
+    it('The method removeProducer need to throw a InternalServerErrorException due an unexpected error in repository removeProducer method', async () => {
+      const producerId: number = 1;
+
+      jest
+        .spyOn(
+          producersService,
+          'throwExceptionIfUserNotExistsByProducerId' as any,
+        )
+        .mockResolvedValue(undefined);
+
+      jest
+        .spyOn(producersRepository, 'removeProducer')
+        .mockRejectedValue(new Error());
+
+      const removeProducerProducer =
+        producersService.removeProducer(producerId);
+
+      await expect(removeProducerProducer).rejects.toBeInstanceOf(
+        InternalServerErrorException,
+      );
+      await expect(removeProducerProducer).rejects.toThrow(
+        'Não foi possível remover este produtor, tente novamente.',
+      );
+    });
+
+    it('The method removeProducer need to return the new producer data when it has been removed successfully', async () => {
       const producerId: number = 1;
 
       const producerData: SaveProducerDto = {
@@ -362,16 +482,16 @@ describe('ProducersService', () => {
         ...producerData,
       };
 
-      mockProducersRepositoryFindProducerById({
-        producersRepository,
-        producerId,
-      });
+      jest
+        .spyOn(
+          producersService,
+          'throwExceptionIfUserNotExistsByProducerId' as any,
+        )
+        .mockResolvedValue(undefined);
 
       jest
         .spyOn(producersRepository, 'removeProducer')
-        .mockImplementation(() => {
-          return Promise.resolve(resultProducerData);
-        });
+        .mockResolvedValue(resultProducerData);
 
       const removeProducerProducer =
         producersService.removeProducer(producerId);
@@ -379,31 +499,6 @@ describe('ProducersService', () => {
       await expect(removeProducerProducer).resolves.toBe(resultProducerData);
       await expect(removeProducerProducer).resolves.not.toBeInstanceOf(
         BadRequestException,
-      );
-    });
-
-    it(`The method removeProducer need to throw a InternalServerErrorException when prisma can't remove the data`, async () => {
-      const producerId: number = 1;
-
-      mockProducersRepositoryFindProducerById({
-        producersRepository,
-        producerId,
-      });
-
-      jest
-        .spyOn(producersRepository, 'removeProducer')
-        .mockImplementation(() => {
-          return Promise.reject(new Error('Ops!'));
-        });
-
-      const removeProducerProducer =
-        producersService.removeProducer(producerId);
-
-      await expect(removeProducerProducer).rejects.toBeInstanceOf(
-        InternalServerErrorException,
-      );
-      await expect(removeProducerProducer).rejects.toThrow(
-        'Não foi possível remover este produtor, tente novamente.',
       );
     });
   });

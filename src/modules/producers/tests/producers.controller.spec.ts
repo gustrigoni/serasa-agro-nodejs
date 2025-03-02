@@ -13,7 +13,7 @@ describe('ProducersController', () => {
   let producersController: ProducersController;
   let producersService: ProducersService;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const testingModule = await Test.createTestingModule({
       controllers: [ProducersController],
       providers: [
@@ -63,13 +63,13 @@ describe('ProducersController', () => {
         document: '00012398755',
       };
 
-      jest.spyOn(producersService, 'createProducer').mockImplementation(() => {
-        return Promise.reject(
+      producersService.createProducer = jest
+        .fn()
+        .mockRejectedValue(
           new BadRequestException(
             'Já existe um produtor cadastrado com este CPF/CNPJ.',
           ),
         );
-      });
 
       const createProducer =
         producersController.createProducer(createProducerDto);
@@ -86,13 +86,13 @@ describe('ProducersController', () => {
         document: '00012398755',
       };
 
-      jest.spyOn(producersService, 'createProducer').mockImplementation(() => {
-        return Promise.reject(
+      producersService.createProducer = jest
+        .fn()
+        .mockRejectedValue(
           new InternalServerErrorException(
             'Não foi possível criar este produtor, tente novamente.',
           ),
         );
-      });
 
       const createProducer =
         producersController.createProducer(createProducerDto);
@@ -118,9 +118,9 @@ describe('ProducersController', () => {
         ...createProducerDto,
       };
 
-      jest.spyOn(producersService, 'createProducer').mockImplementation(() => {
-        return Promise.resolve(resultCreateProducer);
-      });
+      producersService.createProducer = jest
+        .fn()
+        .mockResolvedValue(resultCreateProducer);
 
       const createProducer =
         producersController.createProducer(createProducerDto);
@@ -144,13 +144,13 @@ describe('ProducersController', () => {
         document: '00012398755',
       };
 
-      jest.spyOn(producersService, 'updateProducer').mockImplementation(() => {
-        return Promise.reject(
+      producersService.updateProducer = jest
+        .fn()
+        .mockRejectedValue(
           new BadRequestException(
             'Já existe um produtor cadastrado com este CPF/CNPJ.',
           ),
         );
-      });
 
       const createProducer = producersController.updateProducer(
         updateProducerDto,
@@ -171,11 +171,11 @@ describe('ProducersController', () => {
         document: '00012398755',
       };
 
-      jest.spyOn(producersService, 'updateProducer').mockImplementation(() => {
-        return Promise.reject(
+      producersService.updateProducer = jest
+        .fn()
+        .mockRejectedValue(
           new InternalServerErrorException('O produtor informado não existe.'),
         );
-      });
 
       const createProducer = producersController.updateProducer(
         updateProducerDto,
@@ -206,9 +206,9 @@ describe('ProducersController', () => {
         updatedAt: new Date(),
       };
 
-      jest.spyOn(producersService, 'updateProducer').mockImplementation(() => {
-        return Promise.resolve(resultUpdateProducerDto);
-      });
+      producersService.updateProducer = jest
+        .fn()
+        .mockResolvedValue(resultUpdateProducerDto);
 
       const createProducer = producersController.updateProducer(
         updateProducerDto,
