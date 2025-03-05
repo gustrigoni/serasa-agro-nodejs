@@ -5,3 +5,15 @@ services:
       - 5432:5432
     environment:
       POSTGRES_PASSWORD: rigoni
+
+  app:
+    image: node:22-alpine
+    working_dir: /app
+    volumes:
+      - ./:/app
+    depends_on:
+      - db
+    ports:
+      - 3000:3000
+    command: >
+      sh -c "npm install && npm run test && npm run test:e2e && npx prisma migrate dev && npm run start:dev"
