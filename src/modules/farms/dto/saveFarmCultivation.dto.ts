@@ -62,7 +62,7 @@ export class SaveFarmCultivationDto {
   @MaxLength(4, {
     message: 'A safra do cultivo deve conter no máximo 4 caracteres.',
   })
-  @Matches(/^[0-9A-Za-z\s-]+$/, {
+  @Matches(/^[0-9A-Za-zÀ-ÿ\s-]+$/, {
     message: 'A safra informada não é um valor válido.',
   })
   harvest: string;
