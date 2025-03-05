@@ -4,30 +4,30 @@ export class ListFarmsCultivationsDto {
   @ApiResponseProperty({
     example: 1,
   })
-  totalFarmsCount: number;
+  readonly totalFarmsCount: number;
 
   @ApiResponseProperty({
     example: 1,
   })
-  totalFarmsCountByState: Record<string, number>[];
+  readonly totalFarmsCountByState: Record<string, number>[];
 
   @ApiResponseProperty({
     example: 1,
   })
-  totalFarmsCountCultivations: Record<string, number>[];
+  readonly totalFarmsCountCultivations: Record<string, number>[];
 
   @ApiResponseProperty({
     example: 30000,
   })
-  totalFarmsSumTotalAreas: number;
+  readonly totalFarmsSumTotalAreas: number;
 
   @ApiResponseProperty({
     example: 2850.96,
   })
-  totalFarmsSumCultivableAreas: number;
+  readonly totalFarmsSumCultivableAreas: number;
 
   @ApiResponseProperty({
     example: 27000,
   })
-  totalFarmsSumPreservationAreas: number;
+  readonly totalFarmsSumPreservationAreas: number;
 }
