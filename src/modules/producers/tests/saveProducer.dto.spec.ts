@@ -3,11 +3,11 @@ import { SaveProducerDto } from '../dto/saveProducer.dto';
 
 describe('SaveProducerDto', () => {
   it(`Producer's name when is not informed return an error`, async () => {
-    const producerIdParamDto = new SaveProducerDto();
+    const saveProducerDto = new SaveProducerDto();
 
-    producerIdParamDto.document = '86170674032';
+    saveProducerDto.document = '86170674032';
 
-    const [dtoError] = await validate(producerIdParamDto);
+    const [dtoError] = await validate(saveProducerDto);
 
     expect(dtoError).toBeDefined();
     expect(dtoError.property).toBe('fullName');
@@ -19,13 +19,15 @@ describe('SaveProducerDto', () => {
   });
 
   it(`Producer's name characters is higher than 75 throw an error`, async () => {
-    const producerIdParamDto = new SaveProducerDto();
+    const saveProducerDto = new SaveProducerDto();
 
-    producerIdParamDto.fullName =
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.';
-    producerIdParamDto.document = '86170674032';
+    saveProducerDto.fullName = Array(76)
+      .fill('X')
+      .toString()
+      .replaceAll(',', ' ');
+    saveProducerDto.document = '86170674032';
 
-    const [dtoError] = await validate(producerIdParamDto);
+    const [dtoError] = await validate(saveProducerDto);
 
     expect(dtoError).toBeDefined();
     expect(dtoError.property).toBe('fullName');
@@ -37,12 +39,12 @@ describe('SaveProducerDto', () => {
   });
 
   it(`Producer's full name when is not informed correctly return an error`, async () => {
-    const producerIdParamDto = new SaveProducerDto();
+    const saveProducerDto = new SaveProducerDto();
 
-    producerIdParamDto.fullName = 'Gustavo';
-    producerIdParamDto.document = '86170674032';
+    saveProducerDto.fullName = 'Gustavo';
+    saveProducerDto.document = '86170674032';
 
-    const [dtoError] = await validate(producerIdParamDto);
+    const [dtoError] = await validate(saveProducerDto);
 
     expect(dtoError).toBeDefined();
     expect(dtoError.property).toBe('fullName');
@@ -54,11 +56,11 @@ describe('SaveProducerDto', () => {
   });
 
   it(`Producer's document (CPF/CNPJ) when is not informed return an error`, async () => {
-    const producerIdParamDto = new SaveProducerDto();
+    const saveProducerDto = new SaveProducerDto();
 
-    producerIdParamDto.fullName = 'Gustavo Egidio Rigoni';
+    saveProducerDto.fullName = 'Gustavo Egidio Rigoni';
 
-    const [dtoError] = await validate(producerIdParamDto);
+    const [dtoError] = await validate(saveProducerDto);
 
     expect(dtoError).toBeDefined();
     expect(dtoError.property).toBe('document');
@@ -70,12 +72,12 @@ describe('SaveProducerDto', () => {
   });
 
   it(`Producer's document (CPF/CNPJ) when is not informed only numbers return an error`, async () => {
-    const producerIdParamDto = new SaveProducerDto();
+    const saveProducerDto = new SaveProducerDto();
 
-    producerIdParamDto.fullName = 'Gustavo Egidio Rigoni';
-    producerIdParamDto.document = '0001237893X';
+    saveProducerDto.fullName = 'Gustavo Egidio Rigoni';
+    saveProducerDto.document = '0001237893X';
 
-    const [dtoError] = await validate(producerIdParamDto);
+    const [dtoError] = await validate(saveProducerDto);
 
     expect(dtoError).toBeDefined();
     expect(dtoError.property).toBe('document');
@@ -87,12 +89,12 @@ describe('SaveProducerDto', () => {
   });
 
   it(`Producer's document when is not a valid CPF return an error`, async () => {
-    const producerIdParamDto = new SaveProducerDto();
+    const saveProducerDto = new SaveProducerDto();
 
-    producerIdParamDto.fullName = 'Gustavo Egidio Rigoni';
-    producerIdParamDto.document = '00012378933';
+    saveProducerDto.fullName = 'Gustavo Egidio Rigoni';
+    saveProducerDto.document = '00012378933';
 
-    const [dtoError] = await validate(producerIdParamDto);
+    const [dtoError] = await validate(saveProducerDto);
 
     expect(dtoError).toBeDefined();
     expect(dtoError.property).toBe('document');
@@ -104,12 +106,12 @@ describe('SaveProducerDto', () => {
   });
 
   it(`Producer's document when is not a valid CNPJ return an error`, async () => {
-    const producerIdParamDto = new SaveProducerDto();
+    const saveProducerDto = new SaveProducerDto();
 
-    producerIdParamDto.fullName = 'Gustavo Egidio Rigoni';
-    producerIdParamDto.document = '10251426000173';
+    saveProducerDto.fullName = 'Gustavo Egidio Rigoni';
+    saveProducerDto.document = '10251426000173';
 
-    const [dtoError] = await validate(producerIdParamDto);
+    const [dtoError] = await validate(saveProducerDto);
 
     expect(dtoError).toBeDefined();
     expect(dtoError.property).toBe('document');
@@ -121,34 +123,34 @@ describe('SaveProducerDto', () => {
   });
 
   it(`Producer's full name when is a valid not return an error`, async () => {
-    const producerIdParamDto = new SaveProducerDto();
+    const saveProducerDto = new SaveProducerDto();
 
-    producerIdParamDto.fullName = 'Gustavo Egidio Rigoni';
-    producerIdParamDto.document = '10251426000171';
+    saveProducerDto.fullName = 'Gustavo Egidio Rigoni';
+    saveProducerDto.document = '10251426000171';
 
-    const [dtoError] = await validate(producerIdParamDto);
+    const [dtoError] = await validate(saveProducerDto);
 
     expect(dtoError).not.toBeDefined();
   });
 
   it(`Producer's document when is a valid CNPJ not return an error`, async () => {
-    const producerIdParamDto = new SaveProducerDto();
+    const saveProducerDto = new SaveProducerDto();
 
-    producerIdParamDto.fullName = 'Gustavo Egidio Rigoni';
-    producerIdParamDto.document = '10251426000171';
+    saveProducerDto.fullName = 'Gustavo Egidio Rigoni';
+    saveProducerDto.document = '10251426000171';
 
-    const [dtoError] = await validate(producerIdParamDto);
+    const [dtoError] = await validate(saveProducerDto);
 
     expect(dtoError).not.toBeDefined();
   });
 
   it(`Producer's document when is a valid CPF not return an error`, async () => {
-    const producerIdParamDto = new SaveProducerDto();
+    const saveProducerDto = new SaveProducerDto();
 
-    producerIdParamDto.fullName = 'Gustavo Egidio Rigoni';
-    producerIdParamDto.document = '86170674032';
+    saveProducerDto.fullName = 'Gustavo Egidio Rigoni';
+    saveProducerDto.document = '86170674032';
 
-    const [dtoError] = await validate(producerIdParamDto);
+    const [dtoError] = await validate(saveProducerDto);
 
     expect(dtoError).not.toBeDefined();
   });
