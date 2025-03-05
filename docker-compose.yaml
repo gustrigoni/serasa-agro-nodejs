@@ -10,12 +10,12 @@ services:
   app:
     image: node:22-alpine
     container_name: brainag-node
-    working_dir: /app
-    volumes:
-      - ./:/app
     depends_on:
       - db
     ports:
       - 3000:3000
+    working_dir: /app
+    volumes:
+      - ./:/app
     command: >
-      sh -c "npm install && npx prisma migrate dev && npm run test && npm run test:e2e && npm run start:dev"
+      sh -c "npm install && npx prisma migrate deploy && npm run build && npx prisma generate && npm run start:prod"
