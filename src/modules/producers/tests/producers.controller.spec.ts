@@ -23,7 +23,6 @@ describe('ProducersController', () => {
             createProducer: jest.fn(),
             updateProducer: jest.fn(),
             removeProducer: jest.fn(),
-            delete: jest.fn(),
           },
         },
         {
