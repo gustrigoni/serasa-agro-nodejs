@@ -41,12 +41,12 @@ export class FarmsService {
       cultivableArea,
     ).plus(new Prisma.Decimal(preservedArea));
 
-    const areaTotalIsLessThaSumCultivableAreaAndPreserverdArea =
+    const areaTotalIsLessThanSumCultivableAreaAndPreserverdArea =
       new Prisma.Decimal(sumCultivableAreaAndPreserverdArea).greaterThan(
         totalArea,
       );
 
-    if (areaTotalIsLessThaSumCultivableAreaAndPreserverdArea) {
+    if (areaTotalIsLessThanSumCultivableAreaAndPreserverdArea) {
       throw new BadRequestException(
         'A área em uso não coincide com a área total da propriedade.',
       );
