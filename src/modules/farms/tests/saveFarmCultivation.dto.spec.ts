@@ -1,7 +1,7 @@
 import { validate } from 'class-validator';
 import { SaveFarmCultivationDto } from '../dto/saveFarmCultivation.dto';
 
-describe('SaveFarmDto', () => {
+describe('SaveFarmCultivationDto', () => {
   describe(`Cultivation Name`, () => {
     it(`The object cultivationName need to return a ValidationError value when it contains symbols`, async () => {
       const saveFarmCultivationDto = new SaveFarmCultivationDto();
