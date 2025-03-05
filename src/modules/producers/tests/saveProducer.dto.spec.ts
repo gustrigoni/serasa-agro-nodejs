@@ -1,5 +1,6 @@
 import { validate } from 'class-validator';
 import { SaveProducerDto } from '../dto/saveProducer.dto';
+import { ValidationError } from '@nestjs/common';
 
 describe('SaveProducerDto', () => {
   it(`Producer's name when is not informed return an error`, async () => {
@@ -7,7 +8,7 @@ describe('SaveProducerDto', () => {
 
     saveProducerDto.document = '86170674032';
 
-    const [dtoError] = await validate(saveProducerDto);
+    const [dtoError]: ValidationError[] = await validate(saveProducerDto);
 
     expect(dtoError).toBeDefined();
     expect(dtoError.property).toBe('fullName');
@@ -27,7 +28,7 @@ describe('SaveProducerDto', () => {
       .replaceAll(',', ' ');
     saveProducerDto.document = '86170674032';
 
-    const [dtoError] = await validate(saveProducerDto);
+    const [dtoError]: ValidationError[] = await validate(saveProducerDto);
 
     expect(dtoError).toBeDefined();
     expect(dtoError.property).toBe('fullName');
@@ -44,7 +45,7 @@ describe('SaveProducerDto', () => {
     saveProducerDto.fullName = 'Gustavo';
     saveProducerDto.document = '86170674032';
 
-    const [dtoError] = await validate(saveProducerDto);
+    const [dtoError]: ValidationError[] = await validate(saveProducerDto);
 
     expect(dtoError).toBeDefined();
     expect(dtoError.property).toBe('fullName');
@@ -60,7 +61,7 @@ describe('SaveProducerDto', () => {
 
     saveProducerDto.fullName = 'Gustavo Egidio Rigoni';
 
-    const [dtoError] = await validate(saveProducerDto);
+    const [dtoError]: ValidationError[] = await validate(saveProducerDto);
 
     expect(dtoError).toBeDefined();
     expect(dtoError.property).toBe('document');
@@ -77,7 +78,7 @@ describe('SaveProducerDto', () => {
     saveProducerDto.fullName = 'Gustavo Egidio Rigoni';
     saveProducerDto.document = '0001237893X';
 
-    const [dtoError] = await validate(saveProducerDto);
+    const [dtoError]: ValidationError[] = await validate(saveProducerDto);
 
     expect(dtoError).toBeDefined();
     expect(dtoError.property).toBe('document');
@@ -94,7 +95,7 @@ describe('SaveProducerDto', () => {
     saveProducerDto.fullName = 'Gustavo Egidio Rigoni';
     saveProducerDto.document = '00012378933';
 
-    const [dtoError] = await validate(saveProducerDto);
+    const [dtoError]: ValidationError[] = await validate(saveProducerDto);
 
     expect(dtoError).toBeDefined();
     expect(dtoError.property).toBe('document');
@@ -111,7 +112,7 @@ describe('SaveProducerDto', () => {
     saveProducerDto.fullName = 'Gustavo Egidio Rigoni';
     saveProducerDto.document = '10251426000173';
 
-    const [dtoError] = await validate(saveProducerDto);
+    const [dtoError]: ValidationError[] = await validate(saveProducerDto);
 
     expect(dtoError).toBeDefined();
     expect(dtoError.property).toBe('document');
@@ -128,7 +129,7 @@ describe('SaveProducerDto', () => {
     saveProducerDto.fullName = 'Gustavo Egidio Rigoni';
     saveProducerDto.document = '10251426000171';
 
-    const [dtoError] = await validate(saveProducerDto);
+    const [dtoError]: ValidationError[] = await validate(saveProducerDto);
 
     expect(dtoError).not.toBeDefined();
   });
@@ -139,7 +140,7 @@ describe('SaveProducerDto', () => {
     saveProducerDto.fullName = 'Gustavo Egidio Rigoni';
     saveProducerDto.document = '10251426000171';
 
-    const [dtoError] = await validate(saveProducerDto);
+    const [dtoError]: ValidationError[] = await validate(saveProducerDto);
 
     expect(dtoError).not.toBeDefined();
   });
@@ -150,7 +151,7 @@ describe('SaveProducerDto', () => {
     saveProducerDto.fullName = 'Gustavo Egidio Rigoni';
     saveProducerDto.document = '86170674032';
 
-    const [dtoError] = await validate(saveProducerDto);
+    const [dtoError]: ValidationError[] = await validate(saveProducerDto);
 
     expect(dtoError).not.toBeDefined();
   });

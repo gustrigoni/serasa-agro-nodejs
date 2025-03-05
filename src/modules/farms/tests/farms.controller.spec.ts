@@ -65,7 +65,8 @@ describe('FarmsController', () => {
         .fn()
         .mockRejectedValue(new BadRequestException());
 
-      const resultFarmsController = farmsController.createFarm(saveFarmDto);
+      const resultFarmsController: Promise<FarmEntityDto> =
+        farmsController.createFarm(saveFarmDto);
 
       await expect(resultFarmsController).rejects.toBeDefined();
       await expect(resultFarmsController).rejects.toBeInstanceOf(
@@ -81,7 +82,8 @@ describe('FarmsController', () => {
         .fn()
         .mockRejectedValue(new InternalServerErrorException());
 
-      const resultFarmsController = farmsController.createFarm(saveFarmDto);
+      const resultFarmsController: Promise<FarmEntityDto> =
+        farmsController.createFarm(saveFarmDto);
 
       await expect(resultFarmsController).rejects.toBeDefined();
       await expect(resultFarmsController).rejects.toBeInstanceOf(
@@ -98,7 +100,8 @@ describe('FarmsController', () => {
         .fn()
         .mockResolvedValue(new FarmEntityDto());
 
-      const resultFarmsController = farmsController.createFarm(saveFarmDto);
+      const resultFarmsController: Promise<FarmEntityDto> =
+        farmsController.createFarm(saveFarmDto);
 
       await expect(resultFarmsController).resolves.toBeDefined();
       await expect(resultFarmsController).resolves.toStrictEqual(farmEntityDto);
@@ -113,9 +116,8 @@ describe('FarmsController', () => {
         .fn()
         .mockRejectedValue(new BadRequestException());
 
-      const resultFarmsController = farmsController.createFarmCultivation(
-        saveFarmCultivationDto,
-      );
+      const resultFarmsController: Promise<FarmCultivationEntityDto> =
+        farmsController.createFarmCultivation(saveFarmCultivationDto);
 
       await expect(resultFarmsController).rejects.toBeDefined();
       await expect(resultFarmsController).rejects.toBeInstanceOf(
@@ -131,9 +133,8 @@ describe('FarmsController', () => {
         .fn()
         .mockRejectedValue(new InternalServerErrorException());
 
-      const resultFarmsController = farmsController.createFarmCultivation(
-        saveFarmCultivationDto,
-      );
+      const resultFarmsController: Promise<FarmCultivationEntityDto> =
+        farmsController.createFarmCultivation(saveFarmCultivationDto);
 
       await expect(resultFarmsController).rejects.toBeDefined();
       await expect(resultFarmsController).rejects.toBeInstanceOf(
@@ -150,9 +151,8 @@ describe('FarmsController', () => {
         .fn()
         .mockResolvedValue(new FarmCultivationEntityDto());
 
-      const resultFarmsController = farmsController.createFarmCultivation(
-        saveFarmCultivationDto,
-      );
+      const resultFarmsController: Promise<FarmCultivationEntityDto> =
+        farmsController.createFarmCultivation(saveFarmCultivationDto);
 
       await expect(resultFarmsController).resolves.toBeDefined();
       await expect(resultFarmsController).resolves.toStrictEqual(
@@ -167,7 +167,7 @@ describe('FarmsController', () => {
         .fn()
         .mockRejectedValue(new BadRequestException());
 
-      const resultFarmsController =
+      const resultFarmsController: Promise<ListFarmsCultivationsDto> =
         farmsController.listFarmsCultivationsStatistics();
 
       await expect(resultFarmsController).rejects.toBeDefined();
@@ -182,7 +182,7 @@ describe('FarmsController', () => {
         .fn()
         .mockRejectedValue(new InternalServerErrorException());
 
-      const resultFarmsController =
+      const resultFarmsController: Promise<ListFarmsCultivationsDto> =
         farmsController.listFarmsCultivationsStatistics();
 
       await expect(resultFarmsController).rejects.toBeDefined();
@@ -199,7 +199,7 @@ describe('FarmsController', () => {
         .fn()
         .mockResolvedValue(new ListFarmsCultivationsDto());
 
-      const resultFarmsController =
+      const resultFarmsController: Promise<ListFarmsCultivationsDto> =
         farmsController.listFarmsCultivationsStatistics();
 
       await expect(resultFarmsController).resolves.toBeDefined();

@@ -9,6 +9,7 @@ import { SaveProducerDto } from '../dto/saveProducer.dto';
 import { Producer } from '@prisma/client';
 import { ProducersRepository } from '../producers.repository';
 import { PrismaService } from './../../../modules/prisma/prisma.service';
+import { ProducerEntityDto } from './../../../modules/prisma/dto/producer.entity.dto';
 
 describe('ProducersService', () => {
   let producersService: ProducersService;
@@ -85,7 +86,8 @@ describe('ProducersService', () => {
           ),
         );
 
-      const createProducer = producersService.createProducer(producerData);
+      const createProducer: Promise<ProducerEntityDto> =
+        producersService.createProducer(producerData);
 
       await expect(createProducer).rejects.toBeInstanceOf(BadRequestException);
       await expect(createProducer).rejects.toThrow(
@@ -110,7 +112,8 @@ describe('ProducersService', () => {
           ),
         );
 
-      const createProducer = producersService.createProducer(producerData);
+      const createProducer: Promise<ProducerEntityDto> =
+        producersService.createProducer(producerData);
 
       await expect(createProducer).rejects.toBeInstanceOf(
         InternalServerErrorException,
@@ -137,7 +140,8 @@ describe('ProducersService', () => {
         .fn()
         .mockRejectedValue(new Error());
 
-      const createProducer = producersService.createProducer(producerData);
+      const createProducer: Promise<ProducerEntityDto> =
+        producersService.createProducer(producerData);
 
       await expect(createProducer).rejects.toBeInstanceOf(
         InternalServerErrorException,
@@ -171,7 +175,7 @@ describe('ProducersService', () => {
         .fn()
         .mockResolvedValue(mockResultRepositoryProducerData);
 
-      const resultCreateProducer =
+      const resultCreateProducer: Promise<ProducerEntityDto> =
         producersService.createProducer(producerData);
 
       await expect(resultCreateProducer).resolves.toBe(
@@ -208,10 +212,8 @@ describe('ProducersService', () => {
           new BadRequestException('O produtor informado não existe.'),
         );
 
-      const resultUpdateProducer = producersService.updateProducer(
-        producerId,
-        producerData,
-      );
+      const resultUpdateProducer: Promise<ProducerEntityDto> =
+        producersService.updateProducer(producerId, producerData);
 
       await expect(resultUpdateProducer).rejects.toBeInstanceOf(
         BadRequestException,
@@ -247,10 +249,8 @@ describe('ProducersService', () => {
           ),
         );
 
-      const resultUpdateProducer = producersService.updateProducer(
-        producerId,
-        producerData,
-      );
+      const resultUpdateProducer: Promise<ProducerEntityDto> =
+        producersService.updateProducer(producerId, producerData);
 
       await expect(resultUpdateProducer).rejects.toBeInstanceOf(
         BadRequestException,
@@ -276,10 +276,8 @@ describe('ProducersService', () => {
         .fn()
         .mockResolvedValue(undefined);
 
-      const resultUpdateProducer = producersService.updateProducer(
-        producerId,
-        producerData,
-      );
+      const resultUpdateProducer: Promise<ProducerEntityDto> =
+        producersService.updateProducer(producerId, producerData);
 
       await expect(resultUpdateProducer).rejects.toBeInstanceOf(
         InternalServerErrorException,
@@ -305,10 +303,8 @@ describe('ProducersService', () => {
         .fn()
         .mockRejectedValue(new Error());
 
-      const resultUpdateProducer = producersService.updateProducer(
-        producerId,
-        producerData,
-      );
+      const resultUpdateProducer: Promise<ProducerEntityDto> =
+        producersService.updateProducer(producerId, producerData);
 
       await expect(resultUpdateProducer).rejects.toBeInstanceOf(
         InternalServerErrorException,
@@ -344,10 +340,8 @@ describe('ProducersService', () => {
         .fn()
         .mockRejectedValue(new Error());
 
-      const updateProducer = producersService.updateProducer(
-        producerId,
-        producerData,
-      );
+      const updateProducer: Promise<ProducerEntityDto> =
+        producersService.updateProducer(producerId, producerData);
 
       await expect(updateProducer).rejects.toBeInstanceOf(
         InternalServerErrorException,
@@ -390,10 +384,8 @@ describe('ProducersService', () => {
         .fn()
         .mockResolvedValue(resultProducerData);
 
-      const updateProducer = producersService.updateProducer(
-        producerId,
-        producerData,
-      );
+      const updateProducer: Promise<ProducerEntityDto> =
+        producersService.updateProducer(producerId, producerData);
 
       await expect(updateProducer).resolves.toBe(resultProducerData);
       await expect(updateProducer).resolves.not.toBeInstanceOf(
@@ -413,10 +405,8 @@ describe('ProducersService', () => {
 
       producersRepository.findProducerById = jest.fn().mockResolvedValue(null);
 
-      const updateProducer = producersService.updateProducer(
-        producerId,
-        producerData,
-      );
+      const updateProducer: Promise<ProducerEntityDto> =
+        producersService.updateProducer(producerId, producerData);
 
       await expect(updateProducer).rejects.toBeInstanceOf(BadRequestException);
       await expect(updateProducer).rejects.toThrow(
@@ -431,7 +421,7 @@ describe('ProducersService', () => {
         .fn()
         .mockRejectedValue(new Error());
 
-      const resultRemoveProducerData =
+      const resultRemoveProducerData: Promise<ProducerEntityDto> =
         producersService.removeProducer(producerId);
 
       await expect(resultRemoveProducerData).rejects.toBeInstanceOf(
@@ -456,7 +446,7 @@ describe('ProducersService', () => {
         .spyOn(producersRepository, 'removeProducer')
         .mockRejectedValue(new Error());
 
-      const removeProducerProducer =
+      const removeProducerProducer: Promise<ProducerEntityDto> =
         producersService.removeProducer(producerId);
 
       await expect(removeProducerProducer).rejects.toBeInstanceOf(
@@ -493,7 +483,7 @@ describe('ProducersService', () => {
         .spyOn(producersRepository, 'removeProducer')
         .mockResolvedValue(resultProducerData);
 
-      const removeProducerProducer =
+      const removeProducerProducer: Promise<ProducerEntityDto> =
         producersService.removeProducer(producerId);
 
       await expect(removeProducerProducer).resolves.toBe(resultProducerData);

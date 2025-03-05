@@ -1,5 +1,6 @@
 import { validate } from 'class-validator';
 import { SaveFarmCultivationDto } from '../dto/saveFarmCultivation.dto';
+import { ValidationError } from '@nestjs/common';
 
 describe('SaveFarmCultivationDto', () => {
   describe(`Cultivation Name`, () => {
@@ -11,7 +12,9 @@ describe('SaveFarmCultivationDto', () => {
       saveFarmCultivationDto.cultivatedArea = 87.76;
       saveFarmCultivationDto.harvest = '2025';
 
-      const [dtoError] = await validate(saveFarmCultivationDto);
+      const [dtoError]: ValidationError[] = await validate(
+        saveFarmCultivationDto,
+      );
 
       expect(dtoError).toBeDefined();
       expect(dtoError.constraints?.matches).toBe(
@@ -30,7 +33,9 @@ describe('SaveFarmCultivationDto', () => {
       saveFarmCultivationDto.cultivatedArea = 87.76;
       saveFarmCultivationDto.harvest = '2025';
 
-      const [dtoError] = await validate(saveFarmCultivationDto);
+      const [dtoError]: ValidationError[] = await validate(
+        saveFarmCultivationDto,
+      );
 
       expect(dtoError).toBeDefined();
       expect(dtoError.constraints?.maxLength).toBe(
@@ -45,7 +50,9 @@ describe('SaveFarmCultivationDto', () => {
       saveFarmCultivationDto.cultivatedArea = 87.76;
       saveFarmCultivationDto.harvest = '2025';
 
-      const [dtoError] = await validate(saveFarmCultivationDto);
+      const [dtoError]: ValidationError[] = await validate(
+        saveFarmCultivationDto,
+      );
 
       expect(dtoError).toBeDefined();
       expect(dtoError.constraints?.isNotEmpty).toBe(
@@ -63,7 +70,9 @@ describe('SaveFarmCultivationDto', () => {
       saveFarmCultivationDto.cultivatedArea = 87.76;
       saveFarmCultivationDto.harvest = '2025';
 
-      const [dtoError] = await validate(saveFarmCultivationDto);
+      const [dtoError]: ValidationError[] = await validate(
+        saveFarmCultivationDto,
+      );
 
       expect(dtoError).toBeDefined();
       expect(dtoError.constraints?.isNumber).toBe(
@@ -78,7 +87,9 @@ describe('SaveFarmCultivationDto', () => {
       saveFarmCultivationDto.cultivatedArea = 87.76;
       saveFarmCultivationDto.harvest = '2025';
 
-      const [dtoError] = await validate(saveFarmCultivationDto);
+      const [dtoError]: ValidationError[] = await validate(
+        saveFarmCultivationDto,
+      );
 
       expect(dtoError).toBeDefined();
       expect(dtoError.constraints?.isNotEmpty).toBe(
@@ -96,7 +107,9 @@ describe('SaveFarmCultivationDto', () => {
       saveFarmCultivationDto.cultivatedArea = -1;
       saveFarmCultivationDto.harvest = '2025';
 
-      const [dtoError] = await validate(saveFarmCultivationDto);
+      const [dtoError]: ValidationError[] = await validate(
+        saveFarmCultivationDto,
+      );
 
       expect(dtoError).toBeDefined();
       expect(dtoError.constraints?.min).toBe(
@@ -112,7 +125,9 @@ describe('SaveFarmCultivationDto', () => {
       saveFarmCultivationDto.cultivatedArea = '1' as unknown as number;
       saveFarmCultivationDto.harvest = '2025';
 
-      const [dtoError] = await validate(saveFarmCultivationDto);
+      const [dtoError]: ValidationError[] = await validate(
+        saveFarmCultivationDto,
+      );
 
       expect(dtoError).toBeDefined();
       expect(dtoError.constraints?.isNumber).toBe(
@@ -128,7 +143,9 @@ describe('SaveFarmCultivationDto', () => {
       saveFarmCultivationDto.cultivatedArea = 87.3456;
       saveFarmCultivationDto.harvest = '2025';
 
-      const [dtoError] = await validate(saveFarmCultivationDto);
+      const [dtoError]: ValidationError[] = await validate(
+        saveFarmCultivationDto,
+      );
 
       expect(dtoError).toBeDefined();
       expect(dtoError.constraints?.isNumber).toBe(
@@ -143,7 +160,9 @@ describe('SaveFarmCultivationDto', () => {
       saveFarmCultivationDto.farmId = 1;
       saveFarmCultivationDto.harvest = '2025';
 
-      const [dtoError] = await validate(saveFarmCultivationDto);
+      const [dtoError]: ValidationError[] = await validate(
+        saveFarmCultivationDto,
+      );
 
       expect(dtoError).toBeDefined();
       expect(dtoError.constraints?.isNotEmpty).toBe(
@@ -161,7 +180,9 @@ describe('SaveFarmCultivationDto', () => {
       saveFarmCultivationDto.cultivatedArea = 87.76;
       saveFarmCultivationDto.harvest = '25,A';
 
-      const [dtoError] = await validate(saveFarmCultivationDto);
+      const [dtoError]: ValidationError[] = await validate(
+        saveFarmCultivationDto,
+      );
 
       expect(dtoError).toBeDefined();
       expect(dtoError.constraints?.matches).toBe(
@@ -177,7 +198,9 @@ describe('SaveFarmCultivationDto', () => {
       saveFarmCultivationDto.cultivatedArea = 87.76;
       saveFarmCultivationDto.harvest = 'XXXXX';
 
-      const [dtoError] = await validate(saveFarmCultivationDto);
+      const [dtoError]: ValidationError[] = await validate(
+        saveFarmCultivationDto,
+      );
 
       expect(dtoError).toBeDefined();
       expect(dtoError.constraints?.maxLength).toBe(
@@ -192,7 +215,9 @@ describe('SaveFarmCultivationDto', () => {
       saveFarmCultivationDto.farmId = 1;
       saveFarmCultivationDto.cultivatedArea = 87.76;
 
-      const [dtoError] = await validate(saveFarmCultivationDto);
+      const [dtoError]: ValidationError[] = await validate(
+        saveFarmCultivationDto,
+      );
 
       expect(dtoError).toBeDefined();
       expect(dtoError.constraints?.isNotEmpty).toBe(
@@ -209,7 +234,9 @@ describe('SaveFarmCultivationDto', () => {
     saveFarmCultivationDto.cultivatedArea = 87.76;
     saveFarmCultivationDto.harvest = '2025';
 
-    const [dtoError] = await validate(saveFarmCultivationDto);
+    const [dtoError]: ValidationError[] = await validate(
+      saveFarmCultivationDto,
+    );
 
     expect(dtoError).not.toBeDefined();
   });

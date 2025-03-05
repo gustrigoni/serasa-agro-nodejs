@@ -8,7 +8,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Producer } from '@prisma/client';
-import { ProducerEntityDto } from 'src/modules/prisma/dto/producer.entity.dto';
+import { ProducerEntityDto } from './../../../modules/prisma/dto/producer.entity.dto';
 
 describe('ProducersController', () => {
   let producersController: ProducersController;
@@ -71,8 +71,9 @@ describe('ProducersController', () => {
           ),
         );
 
-      const createProducer =
+      const createProducer: Promise<ProducerEntityDto> =
         producersController.createProducer(createProducerDto);
+
       await expect(createProducer).rejects.toBeInstanceOf(BadRequestException);
       await expect(createProducer).rejects.toThrow(
         'Já existe um produtor cadastrado com este CPF/CNPJ.',
@@ -93,7 +94,7 @@ describe('ProducersController', () => {
           ),
         );
 
-      const createProducer =
+      const createProducer: Promise<ProducerEntityDto> =
         producersController.createProducer(createProducerDto);
 
       await expect(createProducer).rejects.toBeInstanceOf(
@@ -121,7 +122,7 @@ describe('ProducersController', () => {
         .fn()
         .mockResolvedValue(resultCreateProducer);
 
-      const createProducer =
+      const createProducer: Promise<ProducerEntityDto> =
         producersController.createProducer(createProducerDto);
 
       await expect(createProducer).resolves.toBe(resultCreateProducer);
@@ -151,10 +152,8 @@ describe('ProducersController', () => {
           ),
         );
 
-      const createProducer = producersController.updateProducer(
-        updateProducerDto,
-        { producerId },
-      );
+      const createProducer: Promise<ProducerEntityDto> =
+        producersController.updateProducer(updateProducerDto, { producerId });
 
       await expect(createProducer).rejects.toBeInstanceOf(BadRequestException);
       await expect(createProducer).rejects.toThrow(
@@ -176,10 +175,8 @@ describe('ProducersController', () => {
           new InternalServerErrorException('O produtor informado não existe.'),
         );
 
-      const createProducer = producersController.updateProducer(
-        updateProducerDto,
-        { producerId },
-      );
+      const createProducer: Promise<ProducerEntityDto> =
+        producersController.updateProducer(updateProducerDto, { producerId });
 
       await expect(createProducer).rejects.toBeInstanceOf(
         InternalServerErrorException,
@@ -209,10 +206,8 @@ describe('ProducersController', () => {
         .fn()
         .mockResolvedValue(resultUpdateProducerDto);
 
-      const createProducer = producersController.updateProducer(
-        updateProducerDto,
-        { producerId },
-      );
+      const createProducer: Promise<ProducerEntityDto> =
+        producersController.updateProducer(updateProducerDto, { producerId });
 
       await expect(createProducer).resolves.toBe(resultUpdateProducerDto);
       await expect(createProducer).resolves.not.toBeInstanceOf(

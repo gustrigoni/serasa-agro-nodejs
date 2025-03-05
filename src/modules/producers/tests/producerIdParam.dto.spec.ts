@@ -1,5 +1,6 @@
 import { validate } from 'class-validator';
 import { ProducerIdParamDto } from '../dto/producerIdParam.dto';
+import { ValidationError } from '@nestjs/common';
 
 describe('ProducerIdParamDto', () => {
   it(`Producer's unique id can not contain letters`, async () => {
@@ -7,7 +8,7 @@ describe('ProducerIdParamDto', () => {
 
     producerIdParamDto.producerId = 'AaBb';
 
-    const dtoError = await validate(producerIdParamDto);
+    const dtoError: ValidationError[] = await validate(producerIdParamDto);
 
     expect(dtoError).not.toBeNull();
     expect(dtoError).toHaveLength(1);
@@ -18,7 +19,7 @@ describe('ProducerIdParamDto', () => {
 
     producerIdParamDto.producerId = '@)-[]{}~~``';
 
-    const dtoError = await validate(producerIdParamDto);
+    const dtoError: ValidationError[] = await validate(producerIdParamDto);
 
     expect(dtoError).not.toBeNull();
     expect(dtoError).toHaveLength(1);
@@ -29,7 +30,7 @@ describe('ProducerIdParamDto', () => {
 
     producerIdParamDto.producerId = '123456';
 
-    const dtoError = await validate(producerIdParamDto);
+    const dtoError: ValidationError[] = await validate(producerIdParamDto);
 
     expect(dtoError).not.toBeNull();
     expect(dtoError).toHaveLength(0);

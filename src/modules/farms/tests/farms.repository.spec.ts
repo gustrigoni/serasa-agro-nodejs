@@ -3,8 +3,8 @@ import { PrismaService } from '../../../modules/prisma/prisma.service';
 import { FarmsRepository } from '../farms.repository';
 import { SaveFarmDto } from './../dto/saveFarm.dto';
 import { Farm, FarmCultivation, Prisma } from '@prisma/client';
-import { FarmEntityDto } from 'src/modules/prisma/dto/farm.entity.dto';
-import { FarmCultivationEntityDto } from 'src/modules/prisma/dto/farmCultivation.entity.dto';
+import { FarmEntityDto } from './../../../modules/prisma/dto/farm.entity.dto';
+import { FarmCultivationEntityDto } from './../../../modules/prisma/dto/farmCultivation.entity.dto';
 import { SaveFarmCultivationDto } from '../dto/saveFarmCultivation.dto';
 
 describe('FarmsRepository', () => {
@@ -76,7 +76,8 @@ describe('FarmsRepository', () => {
 
       prismaService.farm.create = jest.fn().mockResolvedValue(farmData);
 
-      const resultFarmCreateData = farmsRepository.createFarm(saveFarmDto);
+      const resultFarmCreateData: Promise<FarmEntityDto> =
+        farmsRepository.createFarm(saveFarmDto);
 
       await expect(resultFarmCreateData).resolves.toBeDefined();
       await expect(resultFarmCreateData).resolves.toStrictEqual(
@@ -97,7 +98,8 @@ describe('FarmsRepository', () => {
 
       prismaService.farm.create = jest.fn().mockRejectedValue(new Error());
 
-      const resultFarmCreateData = farmsRepository.createFarm(saveFarmDto);
+      const resultFarmCreateData: Promise<FarmEntityDto> =
+        farmsRepository.createFarm(saveFarmDto);
 
       await expect(resultFarmCreateData).rejects.toBeDefined();
       await expect(resultFarmCreateData).rejects.toThrow();
@@ -173,7 +175,7 @@ describe('FarmsRepository', () => {
         .fn()
         .mockResolvedValue(mockResultSumFarmData);
 
-      const resultSumFarmData =
+      const resultSumFarmData: Promise<Prisma.Decimal> =
         farmsRepository.findCultivatedAreaByFarmId(farmId);
 
       await expect(resultSumFarmData).resolves.toBeDefined();
@@ -225,7 +227,7 @@ describe('FarmsRepository', () => {
         .spyOn(prismaService.farmCultivation, 'create')
         .mockResolvedValue(mockResultSumFarmData);
 
-      const resultCreateFarmCultivationData =
+      const resultCreateFarmCultivationData: Promise<FarmCultivationEntityDto> =
         farmsRepository.createFarmCultivation(saveFarmCultivationDto);
 
       await expect(resultCreateFarmCultivationData).resolves.toBeDefined();

@@ -3,7 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { ProducersRepository } from '../producers.repository';
 import { Producer } from '@prisma/client';
 import { SaveProducerDto } from '../dto/saveProducer.dto';
-import { ProducerEntityDto } from 'src/modules/prisma/dto/producer.entity.dto';
+import { ProducerEntityDto } from './../../../modules/prisma/dto/producer.entity.dto';
 
 describe('ProducersRepository', () => {
   let producersRepository: ProducersRepository;
@@ -84,7 +84,7 @@ describe('ProducersRepository', () => {
         .spyOn(prismaService.producer, 'create')
         .mockResolvedValue(producersList[0]);
 
-      const createdProducerData: Promise<Producer> =
+      const createdProducerData: Promise<ProducerEntityDto> =
         producersRepository.createProducer({
           fullName: producerData.fullName,
           document: producerData.document,
@@ -104,7 +104,7 @@ describe('ProducersRepository', () => {
 
       prismaService.producer.create = jest.fn().mockRejectedValue(new Error());
 
-      const createdProducerData: Promise<Producer> =
+      const createdProducerData: Promise<ProducerEntityDto> =
         producersRepository.createProducer({
           fullName: producerData.fullName,
           document: producerData.document,
@@ -133,7 +133,7 @@ describe('ProducersRepository', () => {
         .spyOn(prismaService.producer, 'update')
         .mockResolvedValue(resultUpdatedProducerData);
 
-      const updateProducerData: Promise<Producer> =
+      const updateProducerData: Promise<ProducerEntityDto> =
         producersRepository.updateProducer(producerId, {
           fullName: producerData.fullName,
           document: producerData.document,
@@ -155,7 +155,7 @@ describe('ProducersRepository', () => {
 
       prismaService.producer.update = jest.fn().mockRejectedValue(new Error());
 
-      const updatedProducerData: Promise<Producer> =
+      const updatedProducerData: Promise<ProducerEntityDto> =
         producersRepository.updateProducer(producerId, {
           fullName: producerData.fullName,
           document: producerData.document,
@@ -178,7 +178,7 @@ describe('ProducersRepository', () => {
         .spyOn(prismaService.producer, 'delete')
         .mockResolvedValue(resultRemovedProducerData);
 
-      const removeProducerData: Promise<Producer> =
+      const removeProducerData: Promise<ProducerEntityDto> =
         producersRepository.removeProducer(producerId);
 
       await expect(removeProducerData).resolves.toBeDefined();
@@ -192,7 +192,7 @@ describe('ProducersRepository', () => {
 
       prismaService.producer.delete = jest.fn().mockRejectedValue(new Error());
 
-      const removeProducerData: Promise<Producer> =
+      const removeProducerData: Promise<ProducerEntityDto> =
         producersRepository.removeProducer(producerId);
 
       await expect(removeProducerData).rejects.toBeDefined();
@@ -212,7 +212,7 @@ describe('ProducersRepository', () => {
         .spyOn(prismaService.producer, 'findUnique')
         .mockResolvedValue(mockProducersRepositoryFindProducerById(producerId));
 
-      const findProducerData: Promise<Producer | null> =
+      const findProducerData: Promise<ProducerEntityDto | null> =
         producersRepository.findProducerById(producerId);
 
       await expect(findProducerData).resolves.toBeDefined();
@@ -229,7 +229,7 @@ describe('ProducersRepository', () => {
         .spyOn(prismaService.producer, 'findUnique')
         .mockResolvedValue(mockProducersRepositoryFindProducerById(producerId));
 
-      const findProducerData: Promise<Producer | null> =
+      const findProducerData: Promise<ProducerEntityDto | null> =
         producersRepository.findProducerById(producerId);
 
       await expect(findProducerData).resolves.toBeDefined();
@@ -243,7 +243,7 @@ describe('ProducersRepository', () => {
         .spyOn(prismaService.producer, 'findUnique')
         .mockRejectedValue(new Error());
 
-      const findProducerData: Promise<Producer | null> =
+      const findProducerData: Promise<ProducerEntityDto | null> =
         producersRepository.findProducerById(producerId);
 
       await expect(findProducerData).rejects.toBeDefined();
@@ -269,7 +269,7 @@ describe('ProducersRepository', () => {
           ),
         );
 
-      const findProducerData: Promise<Producer | null> =
+      const findProducerData: Promise<ProducerEntityDto | null> =
         producersRepository.findProducerDocumetHasAlreadyUsed(
           producerId,
           producerDocument,
@@ -295,7 +295,7 @@ describe('ProducersRepository', () => {
           ),
         );
 
-      const findProducerData: Promise<Producer | null> =
+      const findProducerData: Promise<ProducerEntityDto | null> =
         producersRepository.findProducerDocumetHasAlreadyUsed(
           producerId,
           producerDocument,
@@ -313,7 +313,7 @@ describe('ProducersRepository', () => {
         .spyOn(prismaService.producer, 'findUnique')
         .mockRejectedValue(new Error());
 
-      const findProducerData =
+      const findProducerData: Promise<ProducerEntityDto | null> =
         producersRepository.findProducerDocumetHasAlreadyUsed(
           producerId,
           producerDocument,

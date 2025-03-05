@@ -9,9 +9,9 @@ import {
   Logger,
 } from '@nestjs/common';
 import { PrismaService } from './../../../modules/prisma/prisma.service';
-import { FarmEntityDto } from 'src/modules/prisma/dto/farm.entity.dto';
+import { FarmEntityDto } from './../../../modules/prisma/dto/farm.entity.dto';
 import { SaveFarmCultivationDto } from '../dto/saveFarmCultivation.dto';
-import { FarmCultivationEntityDto } from 'src/modules/prisma/dto/farmCultivation.entity.dto';
+import { FarmCultivationEntityDto } from './../../../modules/prisma/dto/farmCultivation.entity.dto';
 import { ListFarmsCultivationsDto } from '../dto/listFarmsCultivations.dto';
 import { SaveFarmDto } from '../dto/saveFarm.dto';
 
@@ -389,7 +389,7 @@ describe('FarmsService', () => {
 
       farmsRepository.countFarms = jest.fn().mockRejectedValue(new Error());
 
-      const resultListFarmsStatistics =
+      const resultListFarmsStatistics: Promise<ListFarmsCultivationsDto> =
         farmsService.listFarmsCultivationsStatistics();
 
       await expect(resultListFarmsStatistics).rejects.toBeDefined();
@@ -422,7 +422,7 @@ describe('FarmsService', () => {
         .fn()
         .mockRejectedValue(new Error());
 
-      const resultListFarmsStatistics =
+      const resultListFarmsStatistics: Promise<ListFarmsCultivationsDto> =
         farmsService.listFarmsCultivationsStatistics();
 
       await expect(resultListFarmsStatistics).rejects.toBeDefined();
@@ -455,7 +455,7 @@ describe('FarmsService', () => {
         .fn()
         .mockRejectedValue(new Error());
 
-      const resultListFarmsStatistics =
+      const resultListFarmsStatistics: Promise<ListFarmsCultivationsDto> =
         farmsService.listFarmsCultivationsStatistics();
 
       await expect(resultListFarmsStatistics).rejects.toBeDefined();
@@ -488,7 +488,7 @@ describe('FarmsService', () => {
         .fn()
         .mockRejectedValue(new Error());
 
-      const resultListFarmsStatistics =
+      const resultListFarmsStatistics: Promise<ListFarmsCultivationsDto> =
         farmsService.listFarmsCultivationsStatistics();
 
       await expect(resultListFarmsStatistics).rejects.toBeDefined();
@@ -521,7 +521,7 @@ describe('FarmsService', () => {
         .fn()
         .mockRejectedValue(new Error());
 
-      const resultListFarmsStatistics =
+      const resultListFarmsStatistics: Promise<ListFarmsCultivationsDto> =
         farmsService.listFarmsCultivationsStatistics();
 
       await expect(resultListFarmsStatistics).rejects.toBeDefined();
