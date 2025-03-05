@@ -19,7 +19,7 @@ class IsValidStateConstraint implements ValidatorConstraintInterface {
   }
 
   defaultMessage() {
-    return 'O estado informado não é válido';
+    return 'O estado informado não é válido.';
   }
 }
 
@@ -60,11 +60,14 @@ export class SaveFarmDto {
     message:
       'A cidade onde a propriedade está localizada precisa ser informada.',
   })
+  @Matches(/^[A-Za-zÀ-ÿ-]+(?:\s[A-Za-zÀ-ÿ-]+)*$/, {
+    message: 'Nome da cidade deve conter apenas letras, espaços e traços.',
+  })
   @MaxLength(25, {
     message: 'O nome da cidade deve conter no máximo 25 caracteres.',
   })
   @IsString({
-    message: 'Nome da cidade deve conter apenas letras',
+    message: 'Nome da cidade deve conter apenas letras.',
   })
   city: string;
 
@@ -92,7 +95,7 @@ export class SaveFarmDto {
     { message: 'A área total que compõe a propriedade precisa ser informada.' },
   )
   @Min(0, {
-    message: 'A área total informada não pode conter valor negativo',
+    message: 'A área total informada não pode conter valor negativo.',
   })
   totalArea: number;
 
