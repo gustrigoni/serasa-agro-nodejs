@@ -8,6 +8,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Producer } from '@prisma/client';
+import { ProducerEntityDto } from 'src/modules/prisma/dto/producer.entity.dto';
 
 describe('ProducersController', () => {
   let producersController: ProducersController;
@@ -72,7 +73,6 @@ describe('ProducersController', () => {
 
       const createProducer =
         producersController.createProducer(createProducerDto);
-
       await expect(createProducer).rejects.toBeInstanceOf(BadRequestException);
       await expect(createProducer).rejects.toThrow(
         'Já existe um produtor cadastrado com este CPF/CNPJ.',
@@ -219,6 +219,69 @@ describe('ProducersController', () => {
         BadRequestException,
       );
       await expect(createProducer).resolves.not.toBeInstanceOf(
+        InternalServerErrorException,
+      );
+    });
+  });
+
+  describe('Remove Producer', () => {
+    it(`The method removeProducer need to throw a BadRequestException when service's method return a BadRequestException`, async () => {
+      const producerId: string = '1';
+
+      producersService.removeProducer = jest
+        .fn()
+        .mockRejectedValue(new BadRequestException());
+
+      const resultRemoveProducer: Promise<ProducerEntityDto> =
+        producersController.removeProducer({ producerId });
+
+      await expect(resultRemoveProducer).rejects.toBeInstanceOf(
+        BadRequestException,
+      );
+      await expect(resultRemoveProducer).rejects.toThrow();
+    });
+
+    it(`The method removeProducer need to throw a InternalServerErrorException when service's method return a InternalServerErrorException`, async () => {
+      const producerId: string = '1';
+
+      producersService.removeProducer = jest
+        .fn()
+        .mockRejectedValue(new InternalServerErrorException());
+
+      const resultRemoveProducer: Promise<ProducerEntityDto> =
+        producersController.removeProducer({ producerId });
+
+      await expect(resultRemoveProducer).rejects.toBeInstanceOf(
+        InternalServerErrorException,
+      );
+      await expect(resultRemoveProducer).rejects.toThrow();
+    });
+
+    it(`The method removeProducer need to return producer's saved data when the producer's info is valid`, async () => {
+      const producerId: string = '1';
+
+      const resultServiceRemoveProducerEntityDto: Producer = {
+        id: Number(producerId),
+        fullName: 'Gustavo Egidio Rigoni',
+        document: '00012398755',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      producersService.removeProducer = jest
+        .fn()
+        .mockResolvedValue(resultServiceRemoveProducerEntityDto);
+
+      const resultRemoveProducer: Promise<ProducerEntityDto> =
+        producersController.removeProducer({ producerId });
+
+      await expect(resultRemoveProducer).resolves.toBe(
+        resultServiceRemoveProducerEntityDto,
+      );
+      await expect(resultRemoveProducer).resolves.not.toBeInstanceOf(
+        BadRequestException,
+      );
+      await expect(resultRemoveProducer).resolves.not.toBeInstanceOf(
         InternalServerErrorException,
       );
     });
