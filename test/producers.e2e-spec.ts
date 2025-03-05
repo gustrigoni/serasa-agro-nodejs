@@ -83,7 +83,7 @@ describe('Producers (e2e)', () => {
   it('/producers (PATCH) - should not update a producer when producer unique id not exists', async () => {
     const saveProducerDto: SaveProducerDto = {
       fullName: 'New Gustavo Egidio Rigoni',
-      document: '40994249012',
+      document: '26421737048',
     };
 
     const response = await request(app.getHttpServer())
