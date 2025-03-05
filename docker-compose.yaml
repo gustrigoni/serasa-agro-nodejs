@@ -1,6 +1,7 @@
 services:
   db:
     image: postgres:latest
+    container_name: brainag-db
     ports:
       - 5432:5432
     environment:
