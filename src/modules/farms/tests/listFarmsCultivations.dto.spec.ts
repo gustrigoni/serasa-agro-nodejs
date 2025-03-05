@@ -1,7 +1,7 @@
 import { ListFarmsCultivationsDto } from '../dto/listFarmsCultivations.dto';
 
 describe('ListFarmsCultivationsDto', () => {
-  it('The object ListFarmsCultivationsDto need to match defined type', () => {
+  it('The ListFarmsCultivationsDto need to match defined type', () => {
     const listFarmsCultivationsDto = new ListFarmsCultivationsDto();
 
     expect(listFarmsCultivationsDto).toStrictEqual(
@@ -9,7 +9,7 @@ describe('ListFarmsCultivationsDto', () => {
     );
   });
 
-  it('The object ListFarmsCultivationsDto need to have the correct default values', () => {
+  it('The ListFarmsCultivationsDto need to have the correct default values', () => {
     const listFarmsCultivationsDto = new ListFarmsCultivationsDto();
 
     expect(listFarmsCultivationsDto.totalFarmsCount).toBeUndefined();
