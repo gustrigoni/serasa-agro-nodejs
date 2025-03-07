@@ -20,9 +20,10 @@ import {
 } from '@nestjs/swagger';
 import { FarmEntityDto } from '../prisma/dto/farm.entity.dto';
 import { FarmCultivationEntityDto } from '../prisma/dto/farmCultivation.entity.dto';
+import { FarmsControllerInterface } from './interfaces/farms.controller.interface';
 
 @Controller('farms')
-export class FarmsController {
+export class FarmsController implements FarmsControllerInterface {
   constructor(
     private readonly farmService: FarmsService,
     private readonly logger: Logger = new Logger(FarmsController.name),
@@ -62,7 +63,7 @@ export class FarmsController {
   @ApiInternalServerErrorResponse({
     description: `Was not possible to create a cultivation due to an internal error`,
   })
-  async createFarmCultivation(
+  createFarmCultivation(
     @Body() saveFarmCultivationDto: SaveFarmCultivationDto,
   ): Promise<FarmCultivationEntityDto> {
     return this.farmService

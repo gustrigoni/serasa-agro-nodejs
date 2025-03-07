@@ -2,9 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { SaveProducerDto } from './dto/saveProducer.dto';
 import { ProducerEntityDto } from '../prisma/dto/producer.entity.dto';
+import { ProducersRepositoryInterface } from './interfaces/producers.repository.interface';
 
 @Injectable()
-export class ProducersRepository {
+export class ProducersRepository implements ProducersRepositoryInterface {
   constructor(private prisma: PrismaService) {}
 
   async createProducer({

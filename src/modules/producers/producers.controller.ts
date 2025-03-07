@@ -22,9 +22,10 @@ import {
 } from '@nestjs/swagger';
 import { ProducerIdParamDto } from './dto/producerIdParam.dto';
 import { ProducerEntityDto } from '../prisma/dto/producer.entity.dto';
+import { ProducersControllerInterface } from './interfaces/producers.controller.interface';
 
 @Controller('producers')
-export class ProducersController {
+export class ProducersController implements ProducersControllerInterface {
   constructor(
     private readonly producersService: ProducersService,
     private readonly logger: Logger = new Logger(ProducersController.name),

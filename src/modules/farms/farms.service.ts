@@ -12,9 +12,10 @@ import { SaveFarmCultivationDto } from './dto/saveFarmCultivation.dto';
 import { ListFarmsCultivationsDto } from './dto/listFarmsCultivations.dto';
 import { FarmEntityDto } from '../prisma/dto/farm.entity.dto';
 import { FarmCultivationEntityDto } from '../prisma/dto/farmCultivation.entity.dto';
+import { FarmsServiceInterface } from './interfaces/farms.service.interface';
 
 @Injectable()
-export class FarmsService {
+export class FarmsService implements FarmsServiceInterface {
   constructor(
     private producersRepository: ProducersRepository,
     private farmsRepository: FarmsRepository,

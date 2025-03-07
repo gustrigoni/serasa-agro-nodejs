@@ -5,9 +5,10 @@ import { SaveFarmDto } from './dto/saveFarm.dto';
 import { SaveFarmCultivationDto } from './dto/saveFarmCultivation.dto';
 import { FarmEntityDto } from '../prisma/dto/farm.entity.dto';
 import { FarmCultivationEntityDto } from '../prisma/dto/farmCultivation.entity.dto';
+import { FarmsRepositoryInterface } from './interfaces/farms.repository.interface';
 
 @Injectable()
-export class FarmsRepository {
+export class FarmsRepository implements FarmsRepositoryInterface {
   constructor(private prisma: PrismaService) {}
 
   async createFarm(saveFarmDto: SaveFarmDto): Promise<FarmEntityDto> {

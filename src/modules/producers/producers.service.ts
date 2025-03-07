@@ -7,9 +7,10 @@ import {
 import { SaveProducerDto } from './dto/saveProducer.dto';
 import { ProducersRepository } from './producers.repository';
 import { ProducerEntityDto } from '../prisma/dto/producer.entity.dto';
+import { ProducersServiceInterface } from './interfaces/producers.service.interface';
 
 @Injectable()
-export class ProducersService {
+export class ProducersService implements ProducersServiceInterface {
   constructor(
     private producersRepository: ProducersRepository,
     private readonly logger: Logger = new Logger(ProducersService.name),
